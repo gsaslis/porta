@@ -35,6 +35,17 @@ module ServiceDiscovery
       resource.to_h.to_yaml
     end
 
+    def oas?
+      description_language == 'SwaggerJSON'
+    end
+
+    def specification
+      spec_url = "#{endpoint}/#{description_path}"
+      RestClient.get(spec_url)
+    rescue SocketError, RestClient::Exception, Errno::ECONNREFUSED, Errno::ECONNRESET
+      ""
+    end
+
     protected
 
     def discovery_annotation_key(field_name)
