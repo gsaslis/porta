@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 
-class ThreeScale::LocalhostValidatorTest < ActiveSupport::TestCase
+class NonLocalhostValidatorTest < ActiveSupport::TestCase
 
   def test_validate_each
 
-    validator = ThreeScale::LocalhostValidator.new(attributes: [:api_backend])
+    validator = NonLocalhostValidator.new(attributes: [:api_backend])
 
     record = Proxy.new
 
@@ -36,6 +38,5 @@ class ThreeScale::LocalhostValidatorTest < ActiveSupport::TestCase
     errors = validator.validate_each(record, :api_backend, 'https://<yours>')
     assert_includes errors, "Invalid URL format"
     assert record.errors.present?
-
   end
 end
