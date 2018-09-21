@@ -2,6 +2,7 @@
 class Buyers::ApplicationsController < FrontendController
 
   include ThreeScale::Search::Helpers
+  include ThreeScale::Search::CinstancesSearcher
 
   before_action :authorize_partners
   before_action :find_buyer, :only => [:new, :create]
@@ -9,6 +10,7 @@ class Buyers::ApplicationsController < FrontendController
 
   before_action :find_cinstance, :except => [:index, :create, :new]
   before_action :find_provider,  :only => [:edit, :new, :create, :update]
+  before_action :find_service, except: :index
 
   before_action :find_application_plan,          :only => :create
 
@@ -22,31 +24,14 @@ class Buyers::ApplicationsController < FrontendController
     @states = Cinstance.allowed_states.collect(&:to_s).sort
     accessible_services = current_account.accessible_services
     @services = accessible_services.includes(:application_plans)
-    @search = ThreeScale::Search.new(params[:search] || params)
+    @search = searcher
     @application_plans = current_account.application_plans.stock
     @stock_and_custom_application_plans = current_account.application_plans.size
 
-    if params[:service_id]
-      @service = accessible_services.find params[:service_id]
-      @search.service_id = @service.id
-    end
+    @cinstances = find_cinstances(searcher).paginate(pagination_params)
 
-    if params[:application_plan_id]
-      @plan = current_account.application_plans.find params[:application_plan_id]
-      @search.plan_id = @plan.id
-      @service ||= @plan.service
-    end
-
-    if params[:account_id]
-      @account = current_account.buyers.find params[:account_id]
-      @search.account = @account
-      activate_menu :buyers, :accounts
-    end
-
-    @cinstances = current_user.accessible_cinstances
-      .scope_search(@search).order_by(params[:sort], params[:direction])
-      .preload(:service, user_account: [:admin_user], plan: [:pricing_rules])
-      .paginate(pagination_params)
+    @show_services = current_account.multiservice?
+    activate_menu :account if @account
   end
 
   def show
@@ -181,10 +166,6 @@ class Buyers::ApplicationsController < FrontendController
 
   def find_buyer
     @buyer = current_account.buyers.find(params[:account_id])
-  end
-
-  def find_service(id = params[:service_id])
-    @service = current_account.accessible_services.find(id) if id
   end
 
   def find_provider
