@@ -6,7 +6,7 @@ services:
     container_name: ${PROJECT:-system}-database
     network_mode: bridge
   cache:
-    build: .
+    image: quay.io/gsaslis/3scale-system-builder
     network_mode: none
     container_name: ${PROJECT:-system}-cache
     command: sleep infinity 
