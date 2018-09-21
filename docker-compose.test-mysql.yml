@@ -20,6 +20,8 @@ services:
     environment:
       DB_HOST: ${PROJECT:-system}-database
       DISABLE_SPRING: "true"
+    volumes:
+      - .:/opt/system/  
     volumes_from:
       - cache
     depends_on:
