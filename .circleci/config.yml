@@ -2,9 +2,6 @@ version: 2.0
 
 #### YAML ANCHORS INSTEAD OF COMMANDS # while version 2.1 already supports commands, the local runner doesn't. When it does, we can upgrade.
 
-builder-image: &builder-image
-  image: quay.io/gsaslis/3scale-system-builder
-
 git-submodules: &git-submodules
   run:
     name: "Pull Submodules"
@@ -23,8 +20,7 @@ store-test-artifacts: &store-test-artifacts
 
 jobs:
   test1:
-    docker:
-      - *builder-image
+    machine: true
     steps:
       - checkout
       - *git-submodules
@@ -36,8 +32,7 @@ jobs:
       - *store-test-artifacts
 
   test2:
-    docker:
-      - *builder-image
+    machine: true
     steps:
       - checkout
       - *git-submodules
@@ -49,8 +44,7 @@ jobs:
       - *store-test-artifacts
 
   test3:
-    docker:
-      - *builder-image
+    machine: true
     steps:
       - checkout
       - *git-submodules
@@ -62,8 +56,7 @@ jobs:
       - *store-test-artifacts
 
   test4:
-    docker:
-      - *builder-image
+    machine: true
     steps:
       - checkout
       - *git-submodules
@@ -75,8 +68,7 @@ jobs:
       - *store-test-artifacts
 
   test5:
-    docker:
-      - *builder-image
+    machine: true
     steps:
       - checkout
       - *git-submodules
@@ -88,8 +80,7 @@ jobs:
       - *store-test-artifacts
 
   test6:
-    docker:
-      - *builder-image
+    machine: true
     steps:
       - checkout
       - *git-submodules
@@ -101,8 +92,7 @@ jobs:
       - *store-test-artifacts
 
   licenses:
-    docker:
-      - *builder-image
+    machine: true
     steps:
       - checkout
       - *git-submodules
