@@ -3,7 +3,7 @@
 # lower lever functions
 launch_redis()
 {
-    redis-server /etc/redis/redis.conf
+    redis-server /etc/redis.conf
 }
 
 launch_memcached()
