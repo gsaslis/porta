@@ -11,7 +11,7 @@ services:
     container_name: ${PROJECT:-system}-cache
     command: sleep infinity 
   build:
-    build: .
+    image: quay.io/gsaslis/3scale-system-builder
     dns: 127.0.0.1
     container_name: ${PROJECT:-system}-build
     network_mode: bridge
