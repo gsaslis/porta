@@ -24,7 +24,6 @@ jobs:
     steps:
       - checkout
       - *git-submodules
-      - setup_remote_docker
       - run:
           name: Run tests 1
           command: MULTIJOB_KIND=1 make test
@@ -36,7 +35,6 @@ jobs:
     steps:
       - checkout
       - *git-submodules
-      - setup_remote_docker
       - run:
           name: Run tests 2
           command: MULTIJOB_KIND=2 make test
@@ -48,7 +46,6 @@ jobs:
     steps:
       - checkout
       - *git-submodules
-      - setup_remote_docker
       - run:
           name: Run tests 3
           command: MULTIJOB_KIND=3 make test
@@ -60,7 +57,6 @@ jobs:
     steps:
       - checkout
       - *git-submodules
-      - setup_remote_docker
       - run:
           name: Run tests 4
           command: MULTIJOB_KIND=4 make test
@@ -72,7 +68,6 @@ jobs:
     steps:
       - checkout
       - *git-submodules
-      - setup_remote_docker
       - run:
           name: Run tests 5
           command: MULTIJOB_KIND=5 make test
@@ -84,7 +79,6 @@ jobs:
     steps:
       - checkout
       - *git-submodules
-      - setup_remote_docker
       - run:
           name: Run tests 6
           command: MULTIJOB_KIND=6 make test
@@ -96,7 +90,6 @@ jobs:
     steps:
       - checkout
       - *git-submodules
-      - setup_remote_docker
       - run:
           name: Run tests 7
           command: PROXY_ENABLED=1 MULTIJOB_KIND=licenses make test
