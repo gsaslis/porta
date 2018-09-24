@@ -26,6 +26,7 @@ launch_dnsmasq()
                     --server=/github.com/8.8.8.8 \
                     --server=/registry.yarnpkg.com/8.8.8.8 \
                     --server=/registry.npmjs.org/8.8.8.8 \
+                    --server=/nodejs.org/8.8.8.8 \
                     --server=/cc-3scale-amend.herokuapp.com/8.8.8.8 \
                     --server=/percy.io/8.8.8.8 \
                     --user=$(whoami)
