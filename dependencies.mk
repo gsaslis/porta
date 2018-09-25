@@ -36,18 +36,9 @@ npm-install-info:
 	@echo "======= NPM ======="
 	@echo
 
-npm-install-in-container: ## Installs NPM dependencies in development environment inside container.
-npm-install-in-container: CMD = yarn --version && yarn global dir && ${PROXY_ENV} yarn install --frozen-lockfile --link-duplicates
+npm-install-in-container: ## Installs NPM & JSPM dependencies in development environment inside container.
+npm-install-in-container: CMD = yarn --version && yarn global dir && ${PROXY_ENV} yarn install --frozen-lockfile --link-duplicates && jspm -v && ${PROXY_ENV} jspm dl-loader && ${PROXY_ENV} jspm install --lock || ${PROXY_ENV} jspm install --force
 npm-install-in-container: npm-install-info run
-
-jspm-install-info:
-	@echo
-	@echo "======= JSPM ======="
-	@echo
-
-jspm-install-in-container: ## Installs JSPM dependencies in development environment inside container.
-jspm-install-in-container: CMD = jspm -v && ${PROXY_ENV} jspm dl-loader && ${PROXY_ENV} jspm install --lock|| ${PROXY_ENV} jspm install --force
-jspm-install-in-container: jspm-install-info run
 
 
 
