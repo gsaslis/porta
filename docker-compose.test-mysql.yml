@@ -21,7 +21,10 @@ services:
       DB_HOST: ${PROJECT:-system}-database
       DISABLE_SPRING: "true"
     volumes:
-      - .:/opt/system/  
+      - .:/opt/system/
+      - ./node_modules:/opt/system/node_modules
+      - ./vendor/bundle:/opt/system/vendor/bundle
+      - ./vendor/docker-gateway/.luarocks:/home/ruby/.luarocks
     volumes_from:
       - cache
     depends_on:
