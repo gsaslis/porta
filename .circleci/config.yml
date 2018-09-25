@@ -22,7 +22,6 @@ restore-caches: &restore-caches
   restore_cache:
     keys:
       - 3scale-system-bundler-{{ .Branch }}-{{ checksum "Gemfile" }}
-      - 3scale-system-jspm-{{ .Branch }}-{{ checksum "package.json" }}
       - 3scale-system-npm-{{ .Branch }}-{{ checksum "package.json" }}
       - 3scale-system-apicast-{{ .Branch }}
 
@@ -43,18 +42,6 @@ jobs:
           key: 3scale-system-bundler-{{ .Branch }}-{{ checksum "Gemfile" }}
           paths:
             - $CIRCLE_WORKING_DIRECTORY/vendor/bundle
-  deps_jspm:
-    machine: true
-    steps:
-      - checkout
-      - *git-submodules
-      - run:
-          name: Install JSPM dependencies
-          command: make jspm-install-in-container
-      - save_cache:
-          key: 3scale-system-jspm-{{ .Branch }}-{{ checksum "package.json" }}
-          paths:
-            - $CIRCLE_WORKING_DIRECTORY/node_modules
   deps_npm:
     machine: true
     steps:
@@ -172,48 +159,40 @@ workflows:
     jobs:
       - deps_bundler
       - deps_npm
-      - deps_jspm
       - deps_apicast
 
 #      - test1:
 #          requires:
 #            - deps_bundler
 #            - deps_npm
-#            - deps_jspm
 #            - deps_apicast
       - test2:
           requires:
             - deps_bundler
             - deps_npm
-            - deps_jspm
             - deps_apicast
 #      - test3:
 #          requires:
 #            - deps_bundler
 #            - deps_npm
-#            - deps_jspm
 #            - deps_apicast
 #      - test4:
 #          requires:
 #            - deps_bundler
 #            - deps_npm
-#            - deps_jspm
 #            - deps_apicast
 #      - test5:
 #          requires:
 #            - deps_bundler
 #            - deps_npm
-#            - deps_jspm
 #            - deps_apicast
 #      - test6:
 #          requires:
 #            - deps_bundler
 #            - deps_npm
-#            - deps_jspm
 #            - deps_apicast
 #      - licenses:
 #            requires:
 #              - deps_bundler
 #              - deps_npm
-#              - deps_jspm
 #              - deps_apicast
