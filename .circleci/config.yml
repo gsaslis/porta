@@ -31,7 +31,7 @@ restore-caches: &restore-caches
 
 
 jobs:
-  deps-bundler:
+  deps_bundler:
     machine: true
     steps:
       - checkout
@@ -43,7 +43,7 @@ jobs:
           key: 3scale-system-bundler-{{ .Branch }}-{{ checksum "Gemfile" }}
           paths:
             - $CIRCLE_WORKING_DIRECTORY/vendor/bundle
-  deps-jspm:
+  deps_jspm:
     machine: true
     steps:
       - checkout
@@ -55,7 +55,7 @@ jobs:
           key: 3scale-system-jspm-{{ .Branch }}-{{ checksum "package.json" }}
           paths:
             - $CIRCLE_WORKING_DIRECTORY/node_modules
-  deps-npm:
+  deps_npm:
     machine: true
     steps:
       - checkout
@@ -68,7 +68,7 @@ jobs:
           paths:
             - $CIRCLE_WORKING_DIRECTORY/node_modules
 #          - $CIRCLE_WORKING_DIRECTORY/.config/yarn/global
-  deps-apicast:
+  deps_apicast:
     machine: true
     steps:
       - checkout
