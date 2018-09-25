@@ -181,13 +181,12 @@ workflows:
 #            - deps_npm
 #            - deps_jspm
 #            - deps_apicast
-
       - test2:
-        requires:
-          - deps_bundler
-          - deps_npm
-          - deps_jspm
-          - deps_apicast
+          requires:
+            - deps_bundler
+            - deps_npm
+            - deps_jspm
+            - deps_apicast
 #      - test3:
 #          requires:
 #            - deps_bundler
