@@ -90,7 +90,7 @@ jobs:
       - *restore-caches
       - run:
           name: Run tests 2
-          command: MULTIJOB_KIND=2 make test
+          command: MULTIJOB_KIND=2 make test-no-deps
       - *store-junit-test-results
       - *store-test-artifacts
 
