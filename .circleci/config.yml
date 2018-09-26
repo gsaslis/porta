@@ -54,6 +54,7 @@ jobs:
           key: 3scale-system-npm-{{ .Branch }}-{{ checksum "package.json" }}
           paths:
             - $CIRCLE_WORKING_DIRECTORY/node_modules
+            - $CIRCLE_WORKING_DIRECTORY/assets/jspm_packages
 #          - $CIRCLE_WORKING_DIRECTORY/.config/yarn/global
   deps_apicast:
     machine: true
