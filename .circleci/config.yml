@@ -235,16 +235,16 @@ workflows:
       - test2:
           requires:
             - assets_precompile
-      - test2:
+      - test3:
           requires:
             - assets_precompile
-      - test2:
+      - test4:
           requires:
             - assets_precompile
-      - test2:
+      - test5:
           requires:
             - assets_precompile
-      - test2:
+      - test6:
           requires:
             - assets_precompile
       - licenses:
