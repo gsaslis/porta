@@ -30,6 +30,8 @@ restore-caches: &restore-caches
       - 3scale-system-npm_jspm-
       - 3scale-system-gateway-{{ .Branch }}
       - 3scale-system-gateway-
+      - 3scale-system-assets-{{ .Branch }}
+      - 3scale-system-assets-
 
 
 
@@ -78,6 +80,19 @@ jobs:
           key: 3scale-system-gateway-{{ .Branch }}
           paths:
             - ./vendor/docker-gateway/.luarocks
+  assets_precompile:
+    machine:
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - *git-submodules
+      - run:
+          name: Precompile assets
+          command: make precompile-assets
+      - save_cache:
+          key: 3scale-system-assets-{{ .Branch }}
+          paths:
+            - ./public/assets
 
 
   test1:
@@ -175,9 +190,11 @@ workflows:
   version: 2
   parallel_build:
     jobs:
-      - deps_bundler
-      - deps_npm
-      - deps_apicast
+      - precompile_assets:
+          requires:
+            - deps_bundler
+            - deps_npm
+            - deps_apicast
 
 #      - test1:
 #          requires:
@@ -186,9 +203,7 @@ workflows:
 #            - deps_apicast
       - test2:
           requires:
-            - deps_bundler
-            - deps_npm
-            - deps_apicast
+            - precompile_assets
 #      - test3:
 #          requires:
 #            - deps_bundler
