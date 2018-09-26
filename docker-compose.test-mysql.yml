@@ -23,6 +23,7 @@ services:
     volumes:
       - .:/opt/system/
       - ./node_modules:/opt/system/node_modules
+      - ./assets/jspm_packages:/opt/system/assets/jspm_packages
       - ./vendor/bundle:/opt/system/vendor/bundle
       - ./vendor/docker-gateway/.luarocks:/home/ruby/.luarocks
     volumes_from:
