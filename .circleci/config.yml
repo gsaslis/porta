@@ -22,7 +22,7 @@ restore-caches: &restore-caches
   restore_cache:
     keys:
       # when lock file changes, use increasingly general patterns to restore cache
-      - 3scale-system-gems-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+      - 3scale-system-bundler-gems-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
       - 3scale-system-npm_jspm-{{ .Branch }}-{{ checksum "package.json" }}
       - 3scale-system-gateway-{{ .Branch }}-{{ .Revision }}
       - 3scale-system-assets-{{ .Branch }}-{{ .Revision }}
@@ -43,7 +43,7 @@ jobs:
           name: Install gems with bundler
           command: make bundle-in-container
       - save_cache:
-          key: 3scale-system-gems-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+          key: 3scale-system-bundler-gems-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
           paths:
             - ./vendor/bundle
             - ./.bundle/
