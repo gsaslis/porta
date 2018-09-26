@@ -42,6 +42,7 @@ jobs:
           key: 3scale-system-bundler-{{ .Branch }}-{{ checksum "Gemfile" }}
           paths:
             - $CIRCLE_WORKING_DIRECTORY/vendor/bundle
+            - $CIRCLE_WORKING_DIRECTORY/.bundle/
   deps_npm:
     machine: true
     steps:

@@ -28,6 +28,7 @@ services:
       - ./public/assets:/opt/system/public/assets
       - ./.jspm:/root/.jspm
       - ./vendor/bundle:/opt/system/vendor/bundle
+      - ./.bundle:/opt/system/.bundle
       - ./vendor/docker-gateway/.luarocks:/home/ruby/.luarocks
     volumes_from:
       - cache
