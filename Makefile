@@ -84,7 +84,7 @@ precompile-assets-info:
 	@echo "======= Assets Precompile ======="
 	@echo
 precompile-assets: ## Precompiles static assets
-precompile-assets: CMD = "bundle exec rake assets:precompile RAILS_GROUPS=assets RAILS_ENV=production WEBPACKER_PRECOMPILE=false && bundle exec rake assets:precompile RAILS_GROUPS=assets RAILS_ENV=test WEBPACKER_PRECOMPILE=false"
+precompile-assets: CMD = "bundle config && bundle exec rake assets:precompile RAILS_GROUPS=assets RAILS_ENV=production WEBPACKER_PRECOMPILE=false && bundle exec rake assets:precompile RAILS_GROUPS=assets RAILS_ENV=test WEBPACKER_PRECOMPILE=false"
 precompile-assets: precompile-assets-info run
 
 test: ## Runs tests inside container build environment
