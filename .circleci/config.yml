@@ -21,9 +21,15 @@ store-test-artifacts: &store-test-artifacts
 restore-caches: &restore-caches
   restore_cache:
     keys:
+      # when lock file changes, use increasingly general patterns to restore cache
       - 3scale-system-bundler-{{ .Branch }}-{{ checksum "Gemfile" }}
+      - 3scale-system-bundler-{{ .Branch }}-
+      - 3scale-system-bundler-
       - 3scale-system-npm-{{ .Branch }}-{{ checksum "package.json" }}
+      - 3scale-system-npm-{{ .Branch }}-
+      - 3scale-system-npm-
       - 3scale-system-apicast-{{ .Branch }}
+      - 3scale-system-apicast-
 
 
 
