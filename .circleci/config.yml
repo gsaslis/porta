@@ -190,6 +190,9 @@ workflows:
   version: 2
   parallel_build:
     jobs:
+      - deps_bundler
+      - deps_npm
+      - deps_apicast
       - precompile_assets:
           requires:
             - deps_bundler
