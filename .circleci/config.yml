@@ -199,7 +199,7 @@ workflows:
       - deps_bundler
       - deps_npm
       - deps_apicast
-      - precompile_assets:
+      - assets_precompile:
           requires:
             - deps_bundler
             - deps_npm
@@ -212,7 +212,7 @@ workflows:
 #            - deps_apicast
       - test2:
           requires:
-            - precompile_assets
+            - assets_precompile
 #      - test3:
 #          requires:
 #            - deps_bundler
