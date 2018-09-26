@@ -23,17 +23,9 @@ restore-caches: &restore-caches
     keys:
       # when lock file changes, use increasingly general patterns to restore cache
       - 3scale-system-gems-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
-      - 3scale-system-gems-{{ .Branch }}-
-      - 3scale-system-gems-
       - 3scale-system-npm_jspm-{{ .Branch }}-{{ checksum "package.json" }}
-      - 3scale-system-npm_jspm-{{ .Branch }}-
-      - 3scale-system-npm_jspm-
       - 3scale-system-gateway-{{ .Branch }}-{{ .Revision }}
-      - 3scale-system-gateway-{{ .Branch }}
-      - 3scale-system-gateway-
       - 3scale-system-assets-{{ .Branch }}-{{ .Revision }}
-      - 3scale-system-assets-{{ .Branch }}
-      - 3scale-system-assets-
 
 
 
