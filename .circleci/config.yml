@@ -55,7 +55,7 @@ jobs:
           paths:
             - $CIRCLE_WORKING_DIRECTORY/node_modules
             - $CIRCLE_WORKING_DIRECTORY/assets/jspm_packages
-#          - $CIRCLE_WORKING_DIRECTORY/.config/yarn/global
+            - $CIRCLE_WORKING_DIRECTORY/.jspm
   deps_apicast:
     machine: true
     steps:
