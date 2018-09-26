@@ -79,17 +79,26 @@ docker: ## Prints docker version and info
 	@docker info
 	@echo
 
+seed-config-files-info:
+	@echo
+	@echo "======= Seeding config files ======="
+	@echo
+
+seed-config-files: ## Copies example config files in `config/` folder, inside container.
+seed-config-files: CMD = cp config/examples/*.yml config/ && cp config/oracle/odbc*.ini /etc/
+seed-config-files: seed-config-files-info run
+
 precompile-assets-info:
 	@echo
-	@echo "======= Assets Precompile ======="
+	@echo "======= Precompiling Assets ======="
 	@echo
 precompile-assets: ## Precompiles static assets
 precompile-assets: CMD = bundle config && bundle exec rake assets:precompile RAILS_GROUPS=assets RAILS_ENV=production WEBPACKER_PRECOMPILE=false && bundle exec rake assets:precompile RAILS_GROUPS=assets RAILS_ENV=test WEBPACKER_PRECOMPILE=false
-precompile-assets: precompile-assets-info run
+precompile-assets: seed-config-files-info precompile-assets-info run
 
 test: ## Runs tests inside container build environment
 test: COMPOSE_FILE = $(COMPOSE_TEST_FILE)
-test: $(DOCKER_COMPOSE) info bundle-in-container npm-install-in-container jspm-install-in-container apicast-dependencies-in-container
+test: $(DOCKER_COMPOSE) info bundle-in-container npm-install-in-container jspm-install-in-container apicast-dependencies-in-container precompile-assets
 	@echo
 	@echo "======= Tests ======="
 	@echo
