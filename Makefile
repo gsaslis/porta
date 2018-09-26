@@ -128,7 +128,7 @@ run: $(DOCKER_COMPOSE)
 	@echo
 	@echo "======= Run ======="
 	@echo
-	$(DOCKER_COMPOSE) run --rm --name $(PROJECT)-build-run $(DOCKER_ENV) build bash -c "script/docker.sh && source script/proxy_env.sh && echo $(CMD) && $(CMD)"
+	$(DOCKER_COMPOSE) run --rm --name $(PROJECT)-build-run $(DOCKER_ENV) build bash -c "script/docker.sh && source script/proxy_env.sh && echo \"$(CMD)\" && $(CMD)"
 
 bash: ## Opens up shell to environment where tests can be ran
 bash: CMD = script/docker.sh && bundle exec rake db:create db:test:load && bundle exec bash
