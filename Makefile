@@ -79,6 +79,14 @@ docker: ## Prints docker version and info
 	@docker info
 	@echo
 
+precompile-assets-info:
+	@echo
+	@echo "======= Assets Precompile ======="
+	@echo
+precompile-assets: ## Precompiles static assets
+precompile-assets: CMD = "bundle exec rake assets:precompile RAILS_GROUPS=assets RAILS_ENV=production WEBPACKER_PRECOMPILE=false && bundle exec rake assets:precompile RAILS_GROUPS=assets RAILS_ENV=test WEBPACKER_PRECOMPILE=false"
+precompile-assets: precompile-assets-info run
+
 test: ## Runs tests inside container build environment
 test: COMPOSE_FILE = $(COMPOSE_TEST_FILE)
 test: $(DOCKER_COMPOSE) info bundle-in-container npm-install-in-container jspm-install-in-container apicast-dependencies-in-container
