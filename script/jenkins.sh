@@ -15,6 +15,10 @@ cp config/oracle/odbc*.ini /etc/
 echo "======= Assets Precompile ======="
 set -x
 
+#debug
+pwd
+ls -al vendor/bundle
+bundle config
 time bundle exec rake assets:precompile RAILS_GROUPS=assets RAILS_ENV=production WEBPACKER_PRECOMPILE=false
 time bundle exec rake assets:precompile RAILS_GROUPS=assets RAILS_ENV=test WEBPACKER_PRECOMPILE=false
 
