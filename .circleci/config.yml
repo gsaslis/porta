@@ -47,8 +47,8 @@ jobs:
       - save_cache:
           key: 3scale-system-bundler-{{ .Branch }}-{{ checksum "Gemfile" }}
           paths:
-            - $CIRCLE_WORKING_DIRECTORY/vendor/bundle
-            - $CIRCLE_WORKING_DIRECTORY/.bundle/
+            - ./vendor/bundle
+            - ./.bundle/
   deps_npm:
     machine: true
     steps:
@@ -60,9 +60,9 @@ jobs:
       - save_cache:
           key: 3scale-system-npm-{{ .Branch }}-{{ checksum "package.json" }}
           paths:
-            - $CIRCLE_WORKING_DIRECTORY/node_modules
-            - $CIRCLE_WORKING_DIRECTORY/assets/jspm_packages
-            - $CIRCLE_WORKING_DIRECTORY/.jspm
+            - ./node_modules
+            - ./assets/jspm_packages
+            - ./.jspm
   deps_apicast:
     machine: true
     steps:
@@ -74,7 +74,7 @@ jobs:
       - save_cache:
           key: 3scale-system-apicast-{{ .Branch }}
           paths:
-            - $CIRCLE_WORKING_DIRECTORY/vendor/docker-gateway/.luarocks
+            - ./vendor/docker-gateway/.luarocks
 
 
   test1:
