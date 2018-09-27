@@ -56,7 +56,12 @@ RUBY_ENV += RUBY_GC_OLDMALLOC_LIMIT=40125988
 RUBY_ENV += RUBY_GC_OLDMALLOC_LIMIT_MAX=72226778
 RUBY_ENV += RUBY_GC_OLDMALLOC_LIMIT_GROWTH_FACTOR=1.2
 
+ifeq ($(CI),true)
+DOCKER_ENV = CI=true
+else
 DOCKER_ENV = CI=jenkins
+endif
+
 DOCKER_ENV += $(foreach env,$(JENKINS_ENV),$(env)=$(value $(env)))
 DOCKER_ENV += GIT_TIMESTAMP=$(shell git log -1 --pretty=format:%ct)
 DOCKER_ENV += PERCY_PROJECT=3scale/porta PERCY_BRANCH=$(subst origin/,,$(GIT_BRANCH)) PERCY_COMMIT=$(GIT_COMMIT)
