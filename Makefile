@@ -72,6 +72,14 @@ DOCKER_ENV := $(addprefix -e ,$(DOCKER_ENV))
 DOCKER_ENV += -e GIT_COMMIT_MESSAGE='$(subst ','\'',$(shell git log -1 --pretty=format:%B))'
 DOCKER_ENV += -e GIT_COMMITTED_DATE="$(shell git log -1 --pretty=format:%ai)"
 
+SCRIPT_BUNDLER = bundle check --path=vendor/bundle --gemfile=Gemfile || ${PROXY_ENV} bundle install --deployment --retry=5 --gemfile=Gemfile && bundle config
+SCRIPT_NPM = yarn --version && yarn global dir && ${PROXY_ENV} yarn install --frozen-lockfile --link-duplicates && jspm -v && ${PROXY_ENV} jspm dl-loader && ${PROXY_ENV} jspm install --lock || ${PROXY_ENV} jspm install --force
+SCRIPT_APICAST_DEPENDENCIES = cd vendor/docker-gateway && ls -al && ${PROXY_ENV} make dependencies && cd ../../
+SCRIPT_PRECOMPILE_ASSETS = bundle config && bundle exec rake assets:precompile RAILS_GROUPS=assets RAILS_ENV=production WEBPACKER_PRECOMPILE=false && bundle exec rake assets:precompile RAILS_GROUPS=assets RAILS_ENV=test WEBPACKER_PRECOMPILE=false
+SCRIPT_ALL_DEPS = $(SCRIPT_BUNDLER) && $(SCRIPT_NPM) && $(SCRIPT_APICAST_DEPENDENCIES) && $(SCRIPT_PRECOMPILE_ASSETS)
+SCRIPT_BASH = script/docker.sh && $(SCRIPT_ALL_DEPS) && bundle exec rake db:create db:test:load && bundle exec bash
+SCRIPT_TEST = $(SCRIPT_ALL_DEPS) && script/jenkins.sh
+
 default: all
 
 COMPOSE_PROJECT_NAME := $(PROJECT)
@@ -115,12 +123,13 @@ precompile-assets-info:
 	@echo "======= Assets Precompile ======="
 	@echo
 precompile-assets: ## Precompiles static assets
-precompile-assets: CMD = bundle config && bundle exec rake assets:precompile RAILS_GROUPS=assets RAILS_ENV=production WEBPACKER_PRECOMPILE=false && bundle exec rake assets:precompile RAILS_GROUPS=assets RAILS_ENV=test WEBPACKER_PRECOMPILE=false
+precompile-assets: CMD = $(SCRIPT_PRECOMPILE_ASSETS)
 precompile-assets: precompile-assets-info run
 
 test: ## Runs tests inside container build environment
 test: COMPOSE_FILE = $(COMPOSE_TEST_FILE)
-test: $(DOCKER_COMPOSE) info bundle-in-container npm-install-in-container apicast-dependencies-in-container
+test: CMD = $(SCRIPT_TEST)
+test: $(DOCKER_COMPOSE) info
 	@echo
 	@echo "======= Tests ======="
 	@echo
@@ -128,6 +137,7 @@ test: $(DOCKER_COMPOSE) info bundle-in-container npm-install-in-container apicas
 
 test-no-deps: ## Runs only tests (without dependency installation) inside container build environment
 test-no-deps: COMPOSE_FILE = $(COMPOSE_TEST_FILE)
+test-no-deps: CMD = script/jenkins.sh
 test-no-deps: $(DOCKER_COMPOSE) info
 	@echo
 	@echo "======= Tests ======="
@@ -162,7 +172,7 @@ run: $(DOCKER_COMPOSE)
 	$(DOCKER_COMPOSE) run --rm --name $(PROJECT)-build-run $(DOCKER_ENV) build bash -c "script/docker.sh && source script/proxy_env.sh && echo \"$(CMD)\" && $(CMD)"
 
 bash: ## Opens up shell to environment where tests can be ran
-bash: CMD = script/docker.sh && bundle exec rake db:create db:test:load && bundle exec bash
+bash: CMD = $(SCRIPT_BASH)
 bash: run
 
 build: ## Build the container image using one of the docker-compose file set by $(COMPOSE_FILE) env var
