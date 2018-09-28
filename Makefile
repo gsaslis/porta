@@ -86,7 +86,7 @@ include wget.mk
 include docker-compose.mk
 include openshift.mk
 
-.PHONY: default all clean build test info jenkins-env docker test-run tmp-export run test-bash clean-cache clean-tmp compose help bundle-in-container apicast-dependencies-in-container jspm-install-in-container npm-install-in-container test-no-deps
+.PHONY: default all clean build test info jenkins-env docker test-run tmp-export run test-bash clean-cache clean-tmp compose help bundle-in-container apicast-dependencies-in-container npm-install-in-container test-no-deps
 .DEFAULT_GOAL := help
 
 # From here on, only phony targets to manage docker compose
@@ -120,7 +120,7 @@ precompile-assets: precompile-assets-info run
 
 test: ## Runs tests inside container build environment
 test: COMPOSE_FILE = $(COMPOSE_TEST_FILE)
-test: $(DOCKER_COMPOSE) info bundle-in-container npm-install-in-container jspm-install-in-container apicast-dependencies-in-container
+test: $(DOCKER_COMPOSE) info bundle-in-container npm-install-in-container apicast-dependencies-in-container
 	@echo
 	@echo "======= Tests ======="
 	@echo
