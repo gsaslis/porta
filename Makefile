@@ -77,7 +77,7 @@ SCRIPT_NPM = yarn --version && yarn global dir && ${PROXY_ENV} yarn install --fr
 SCRIPT_APICAST_DEPENDENCIES = cd vendor/docker-gateway && ls -al && ${PROXY_ENV} make dependencies && cd ../../
 SCRIPT_PRECOMPILE_ASSETS = bundle config && bundle exec rake assets:precompile RAILS_GROUPS=assets RAILS_ENV=production WEBPACKER_PRECOMPILE=false && bundle exec rake assets:precompile RAILS_GROUPS=assets RAILS_ENV=test WEBPACKER_PRECOMPILE=false
 SCRIPT_ALL_DEPS = $(SCRIPT_BUNDLER) && $(SCRIPT_NPM) && $(SCRIPT_APICAST_DEPENDENCIES) && $(SCRIPT_PRECOMPILE_ASSETS)
-SCRIPT_BASH = script/docker.sh && $(SCRIPT_ALL_DEPS) && bundle exec rake db:create db:test:load && bundle exec bash
+SCRIPT_BASH = $(SCRIPT_ALL_DEPS) && bundle exec rake db:create db:test:load && bundle exec bash
 SCRIPT_TEST = $(SCRIPT_ALL_DEPS) && script/jenkins.sh
 
 default: all
