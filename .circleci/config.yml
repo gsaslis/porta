@@ -208,12 +208,12 @@ jobs:
     docker:
       - image: quay.io/gsaslis/3scale-system-builder
       - image: mysql:5.7
-      - image: memcached:1.5-alpine
-      - image: redis:4.0-alpine
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_ROOT_PASSWORD: ''
           MYSQL_DATABASE: circleci
+      - image: memcached:1.5-alpine
+      - image: redis:4.0-alpine
     steps:
       - checkout
       - *git-submodules
