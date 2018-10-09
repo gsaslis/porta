@@ -5,6 +5,12 @@ services:
     privileged: true
     container_name: ${PROJECT:-system}-database
     network_mode: bridge
+  redis:
+    image: redis:4.0-alpine
+    network_mode: bridge
+  memcached:
+    image: memcached:1.5-alpine
+    network_mode: bridge
   cache:
     image: quay.io/gsaslis/3scale-system-builder
     network_mode: none
@@ -36,3 +42,5 @@ services:
       - database
     links:
       - database
+      - redis
+      - memcached
