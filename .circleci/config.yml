@@ -37,7 +37,20 @@ restore-assets-cache: &restore-assets-cache
 
 
 
+attach-to-workspace: &attach-to-workspace
+  attach_workspace:
+    at: .
 
+persist-to-workspace: &persist-to-workspace
+  persist_to_workspace:
+    root: .
+    paths:
+    - ./vendor/bundle
+    - ./.bundle/
+    - ./node_modules
+    - ./assets/jspm_packages
+    - ./.jspm
+    - ./public/assets
 
 jobs:
   dependencies_bundler:
@@ -49,14 +62,13 @@ jobs:
       - *restore-bundler-cache
       - run:
           name: Install gems with bundler
-          command: |
-            gem install bundler --version 1.16.2 --no-doc
-            make bundle-in-container
+          command: make bundle-in-container
       - save_cache:
           key: v1-bundler-gems-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
           paths:
             - ./vendor/bundle
             - ./.bundle/
+      - *persist-to-workspace
   dependencies_npm:
     docker:
       - image: quay.io/gsaslis/3scale-system-builder
@@ -73,6 +85,7 @@ jobs:
             - ./node_modules
             - ./assets/jspm_packages
             - ./.jspm
+      - *persist-to-workspace
 #  dependencies_apicast:
 #    docker:
 #      - image: quay.io/gsaslis/3scale-system-builder
@@ -93,9 +106,7 @@ jobs:
     steps:
       - checkout
       - *git-submodules
-      - *restore-bundler-cache
-      - *restore-npm-cache
-#      - *restore-gateway-cache
+      - *attach-to-workspace
       - *restore-assets-cache
       - run:
           name: Precompile assets
@@ -104,7 +115,7 @@ jobs:
           key: v1-assets-{{ arch }}-{{ .Branch }}-{{ .Revision }}
           paths:
             - ./public/assets
-
+      - *persist-to-workspace
 
   test1:
     machine:
@@ -213,10 +224,7 @@ jobs:
     steps:
       - checkout
       - *git-submodules
-      - *restore-bundler-cache
-      - *restore-npm-cache
-#      - *restore-gateway-cache
-      - *restore-assets-cache
+      - *attach-to-workspace
       - run:
           name: Run tests 7
           command: PROXY_ENABLED=1 MULTIJOB_KIND=licenses make test-no-deps
