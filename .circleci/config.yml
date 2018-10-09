@@ -209,6 +209,8 @@ jobs:
           command: |
             TESTS=$(ruby -e "puts Dir['test/${CIRCLE_JOB}/**/*_test.rb']")
             bundle exec ruby -Itest -rtest_helper -e 'ARGV.map(&File.method(:expand_path)).map(&method(:require))'  -- $(echo $TESTS | circleci tests split --split-by=timings)
+          environment:
+            LC_ALL: en_US.UTF-8
       - *store-junit-test-results
       - *store-test-artifacts
   integration:
