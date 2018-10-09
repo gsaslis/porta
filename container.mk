@@ -1,6 +1,6 @@
 run: ## Runs command $(CMD) without starting any containers.
 run:
-	bash -c "script/docker.sh && source script/proxy_env.sh && echo \"$(CMD)\" && $(CMD)"
+	$(CMD)
 
 
 test: ## Runs tests inside container build environment
