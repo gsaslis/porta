@@ -155,7 +155,7 @@ jobs:
       - *store-junit-test-results
       - *store-test-artifacts
 
-  test:
+  unit:
     docker:
       - image: quay.io/gsaslis/3scale-system-builder
       - image: mysql:5.7
@@ -179,7 +179,64 @@ jobs:
       - run:
           name: Rails tests
           command: |
-            bundle exec ruby -Itest -e 'ARGV.map(&File.method(:expand_path)).map(&method(:require))'  -- $(circleci tests glob "test/**/*_test.rb" | circleci tests split --split-by=timings)
+            TESTS=$(ruby -e 'puts `circleci tests glob test/**/*_test.rb`.split - `circleci tests glob test/{functional,integration,remote,performance}/**/*_test.rb`.split')
+            bundle exec ruby -Itest -e 'ARGV.map(&File.method(:expand_path)).map(&method(:require))'  -- $(echo $TESTS | circleci tests split --split-by=timings)
+      - *store-junit-test-results
+      - *store-test-artifacts
+  functional:
+    docker:
+      - image: quay.io/gsaslis/3scale-system-builder
+      - image: mysql:5.7
+        environment:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_ROOT_PASSWORD: ''
+          MYSQL_DATABASE: circleci
+      - image: memcached:1.5-alpine
+      - image: redis:4.0-alpine
+    steps:
+      - checkout
+      - *git-submodules
+      - *attach-to-workspace
+      - *restore-bundler-cache
+      - *restore-npm-cache
+      - run:
+          name: Prepare database & config files
+          command: |
+            cp config/examples/*.yml config/
+            bundle exec rake db:create db:test:prepare
+      - run:
+          name: Rails tests
+          command: |
+            TESTS=$(circleci tests glob "test/functional/**/*_test.rb")
+            bundle exec ruby -Itest -e 'ARGV.map(&File.method(:expand_path)).map(&method(:require))'  -- $(echo $TESTS | circleci tests split --split-by=timings)
+      - *store-junit-test-results
+      - *store-test-artifacts
+  integration:
+    docker:
+      - image: quay.io/gsaslis/3scale-system-builder
+      - image: mysql:5.7
+        environment:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_ROOT_PASSWORD: ''
+          MYSQL_DATABASE: circleci
+      - image: memcached:1.5-alpine
+      - image: redis:4.0-alpine
+    steps:
+      - checkout
+      - *git-submodules
+      - *attach-to-workspace
+      - *restore-bundler-cache
+      - *restore-npm-cache
+      - run:
+          name: Prepare database & config files
+          command: |
+            cp config/examples/*.yml config/
+            bundle exec rake db:create db:test:prepare
+      - run:
+          name: Rails tests
+          command: |
+            TESTS=$(circleci tests glob "test/integration/**/*_test.rb")
+            bundle exec ruby -Itest -e 'ARGV.map(&File.method(:expand_path)).map(&method(:require))'  -- $(echo $TESTS | circleci tests split --split-by=timings)
       - *store-junit-test-results
       - *store-test-artifacts
   rspec:
@@ -253,7 +310,13 @@ workflows:
       - lint:
           requires:
             - assets_precompile
-      - test:
+      - unit:
+          requires:
+            - dependencies_bundler
+      - functional:
+          requires:
+            - dependencies_bundler
+      - integration:
           requires:
             - dependencies_bundler
       - rspec:
