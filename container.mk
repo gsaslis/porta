@@ -13,7 +13,7 @@ test-no-deps: CMD = script/jenkins.sh
 test-no-deps: test-with-info
 
 test-run: ## Runs tests
-test-run: clean-tmp cache
+test-run: clean-tmp
 	$(CMD)
 
 test-with-info: info
