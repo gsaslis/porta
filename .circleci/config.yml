@@ -21,19 +21,19 @@ store-test-artifacts: &store-test-artifacts
 restore-bundler-cache: &restore-bundler-cache
   restore_cache:
     keys:
-      - 3scale-system-bundler-gems-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+      - v1-bundler-gems-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
 restore-npm-cache: &restore-npm-cache
   restore_cache:
     keys:
-      - 3scale-system-npm_jspm-{{ .Branch }}-{{ checksum "package.json" }}
-restore-gateway-cache: &restore-gateway-cache
-  restore_cache:
-    keys:
-      - 3scale-system-gateway-{{ .Branch }}-{{ .Revision }}
+      - v1-npm-{{ arch }}-{{ .Branch }}-{{ checksum "package.json" }}
+#restore-gateway-cache: &restore-gateway-cache
+#  restore_cache:
+#    keys:
+#      - v1-gateway-{{ arch }}-{{ .Branch }}-{{ .Revision }}
 restore-assets-cache: &restore-assets-cache
   restore_cache:
     keys:
-      - 3scale-system-assets-{{ .Branch }}-{{ .Revision }}
+      - v1-assets-{{ arch }}-{{ .Branch }}-{{ .Revision }}
 
 
 
@@ -51,7 +51,7 @@ jobs:
           name: Install gems with bundler
           command: make bundle-in-container
       - save_cache:
-          key: 3scale-system-bundler-gems-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+          key: v1-bundler-gems-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
           paths:
             - ./vendor/bundle
             - ./.bundle/
@@ -66,25 +66,25 @@ jobs:
           name: Install NPM dependencies
           command: make npm-install-in-container
       - save_cache:
-          key: 3scale-system-npm_jspm-{{ .Branch }}-{{ checksum "package.json" }}
+          key: v1-npm-{{ arch }}-{{ .Branch }}-{{ checksum "package.json" }}
           paths:
             - ./node_modules
             - ./assets/jspm_packages
             - ./.jspm
-  dependencies_apicast:
-    docker:
-      - image: quay.io/gsaslis/3scale-system-builder
-    steps:
-      - checkout
-      - *git-submodules
-      - *restore-gateway-cache
-      - run:
-          name: Install Apicast dependencies
-          command: make apicast-dependencies-in-container
-      - save_cache:
-          key: 3scale-system-gateway-{{ .Branch }}-{{ .Revision }}
-          paths:
-            - ./vendor/docker-gateway/.luarocks
+#  dependencies_apicast:
+#    docker:
+#      - image: quay.io/gsaslis/3scale-system-builder
+#    steps:
+#      - checkout
+#      - *git-submodules
+#      - *restore-gateway-cache
+#      - run:
+#          name: Install Apicast dependencies
+#          command: make apicast-dependencies-in-container
+#      - save_cache:
+#          key: v1-gateway-{{ arch }}-{{ .Branch }}-{{ .Revision }}
+#          paths:
+#            - ./vendor/docker-gateway/.luarocks
   assets_precompile:
     docker:
       - image: quay.io/gsaslis/3scale-system-builder
@@ -93,13 +93,13 @@ jobs:
       - *git-submodules
       - *restore-bundler-cache
       - *restore-npm-cache
-      - *restore-gateway-cache
+#      - *restore-gateway-cache
       - *restore-assets-cache
       - run:
           name: Precompile assets
           command: make precompile-assets
       - save_cache:
-          key: 3scale-system-assets-{{ .Branch }}-{{ .Revision }}
+          key: v1-assets-{{ arch }}-{{ .Branch }}-{{ .Revision }}
           paths:
             - ./public/assets
 
@@ -112,7 +112,7 @@ jobs:
       - *git-submodules
       - *restore-bundler-cache
       - *restore-npm-cache
-      - *restore-gateway-cache
+#      - *restore-gateway-cache
       - *restore-assets-cache
       - run:
           name: Run tests 1
@@ -128,7 +128,7 @@ jobs:
       - *git-submodules
       - *restore-bundler-cache
       - *restore-npm-cache
-      - *restore-gateway-cache
+#      - *restore-gateway-cache
       - *restore-assets-cache
       - run:
           name: Run tests 2
@@ -144,7 +144,7 @@ jobs:
       - *git-submodules
       - *restore-bundler-cache
       - *restore-npm-cache
-      - *restore-gateway-cache
+#      - *restore-gateway-cache
       - *restore-assets-cache
       - run:
           name: Run tests 3
@@ -160,7 +160,7 @@ jobs:
       - *git-submodules
       - *restore-bundler-cache
       - *restore-npm-cache
-      - *restore-gateway-cache
+#      - *restore-gateway-cache
       - *restore-assets-cache
       - run:
           name: Run tests 4
@@ -176,7 +176,7 @@ jobs:
       - *git-submodules
       - *restore-bundler-cache
       - *restore-npm-cache
-      - *restore-gateway-cache
+#      - *restore-gateway-cache
       - *restore-assets-cache
       - run:
           name: Run tests 5
@@ -192,7 +192,7 @@ jobs:
       - *git-submodules
       - *restore-bundler-cache
       - *restore-npm-cache
-      - *restore-gateway-cache
+#      - *restore-gateway-cache
       - *restore-assets-cache
       - run:
           name: Run tests 6
@@ -213,7 +213,7 @@ jobs:
       - *git-submodules
       - *restore-bundler-cache
       - *restore-npm-cache
-      - *restore-gateway-cache
+#      - *restore-gateway-cache
       - *restore-assets-cache
       - run:
           name: Run tests 7
@@ -227,12 +227,12 @@ workflows:
     jobs:
       - dependencies_bundler
       - dependencies_npm
-      - dependencies_apicast
+#      - dependencies_apicast
       - assets_precompile:
           requires:
             - dependencies_bundler
             - dependencies_npm
-            - dependencies_apicast
+#            - dependencies_apicast
 
 #      - test1:
 #          requires:
