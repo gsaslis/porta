@@ -59,6 +59,17 @@ clean-cache: export CACHE = true
 clean-cache:
 	$(MAKE) clean
 
+docker: ## Prints docker version and info
+	@echo
+	@echo "======= Docker ======="
+	@echo
+	@docker version
+	@echo
+	@docker info
+	@echo
+
+info: docker jenkins-env # Prints relevant environment info
+
 oracle-database: ## Starts Oracle database container
 oracle-database: ORACLE_DATA_DIR ?= $(HOME)
 oracle-database:

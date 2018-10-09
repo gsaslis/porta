@@ -105,22 +105,12 @@ include dependencies.mk
 # From here on, only phony targets to manage docker compose
 all: clean clean-tmp build test ## Cleans environment, builds docker image and runs tests
 
-info: docker jenkins-env # Prints relevant environment info
 
 jenkins-env: ## Prints env vars
 	@echo
 	@echo "======= Jenkins environment ======="
 	@echo
 	@env
-	@echo
-
-docker: ## Prints docker version and info
-	@echo
-	@echo "======= Docker ======="
-	@echo
-	@docker version
-	@echo
-	@docker info
 	@echo
 
 precompile-assets-info:

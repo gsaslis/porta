@@ -2,6 +2,7 @@ run: ## Runs command $(CMD) without starting any containers.
 run:
 	$(CMD)
 
+info: jenkins-env # Prints relevant environment info
 
 test: ## Runs tests inside container build environment
 test: CMD = $(SCRIPT_TEST)
