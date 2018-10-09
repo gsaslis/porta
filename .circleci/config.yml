@@ -180,7 +180,7 @@ jobs:
           name: Rails tests
           command: |
             TESTS=$(ruby -e 'puts Dir["test/**/*_test.rb"] - Dir["test/{functional,integration,remote,performance}/**/*_test.rb"]')
-            bundle exec ruby -Itest -e 'ARGV.map(&File.method(:expand_path)).map(&method(:require))'  -- $(echo $TESTS | circleci tests split --split-by=timings)
+            bundle exec ruby -Itest -rtest_helper -e 'ARGV.map(&File.method(:expand_path)).map(&method(:require))'  -- $(echo $TESTS | circleci tests split --split-by=timings)
       - *store-junit-test-results
       - *store-test-artifacts
   functional:
@@ -207,8 +207,8 @@ jobs:
       - run:
           name: Rails tests
           command: |
-            TESTS=$(circleci tests glob "test/functional/**/*_test.rb")
-            bundle exec ruby -Itest -e 'ARGV.map(&File.method(:expand_path)).map(&method(:require))'  -- $(echo $TESTS | circleci tests split --split-by=timings)
+            TESTS=$(ruby -e "puts Dir['test/${CIRCLE_JOB}/**/*_test.rb']")
+            bundle exec ruby -Itest -rtest_helper -e 'ARGV.map(&File.method(:expand_path)).map(&method(:require))'  -- $(echo $TESTS | circleci tests split --split-by=timings)
       - *store-junit-test-results
       - *store-test-artifacts
   integration:
@@ -235,8 +235,8 @@ jobs:
       - run:
           name: Rails tests
           command: |
-            TESTS=$(circleci tests glob "test/integration/**/*_test.rb")
-            bundle exec ruby -Itest -e 'ARGV.map(&File.method(:expand_path)).map(&method(:require))'  -- $(echo $TESTS | circleci tests split --split-by=timings)
+            TESTS=$(ruby -e "puts Dir['test/${CIRCLE_JOB}/**/*_test.rb']")
+            bundle exec ruby -Itest -rtest_helper -e 'ARGV.map(&File.method(:expand_path)).map(&method(:require))'  -- $(echo $TESTS | circleci tests split --split-by=timings)
       - *store-junit-test-results
       - *store-test-artifacts
   rspec:
