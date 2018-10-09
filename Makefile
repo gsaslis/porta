@@ -91,7 +91,7 @@ COMPOSE_TEST_FILE := docker-compose.test-$(DB).yml
 ORACLE_DB_IMAGE := quay.io/3scale/oracle:12.2.0.1-ee
 
 include wget.mk
-ifndef RUNNING_IN_DOCKER
+ifndef CIRCLECI
 	include docker-compose.mk
 else
 	include container.mk

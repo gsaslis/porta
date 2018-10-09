@@ -41,8 +41,8 @@ restore-assets-cache: &restore-assets-cache
 
 jobs:
   dependencies_bundler:
-    machine:
-      docker_layer_caching: true
+    docker:
+      - image: quay.io/gsaslis/3scale-system-builder
     steps:
       - checkout
       - *git-submodules
@@ -56,8 +56,8 @@ jobs:
             - ./vendor/bundle
             - ./.bundle/
   dependencies_npm:
-    machine:
-      docker_layer_caching: true
+    docker:
+      - image: quay.io/gsaslis/3scale-system-builder
     steps:
       - checkout
       - *git-submodules
@@ -72,8 +72,8 @@ jobs:
             - ./assets/jspm_packages
             - ./.jspm
   dependencies_apicast:
-    machine:
-      docker_layer_caching: true
+    docker:
+      - image: quay.io/gsaslis/3scale-system-builder
     steps:
       - checkout
       - *git-submodules
@@ -86,8 +86,8 @@ jobs:
           paths:
             - ./vendor/docker-gateway/.luarocks
   assets_precompile:
-    machine:
-      docker_layer_caching: true
+    docker:
+      - image: quay.io/gsaslis/3scale-system-builder
     steps:
       - checkout
       - *git-submodules
@@ -201,8 +201,13 @@ jobs:
       - *store-test-artifacts
 
   licenses:
-    machine:
-      docker_layer_caching: true
+    docker:
+      - image: quay.io/gsaslis/3scale-system-builder
+      - image: mysql:5.7
+        environment:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_ROOT_PASSWORD: ''
+          MYSQL_DATABASE: circleci
     steps:
       - checkout
       - *git-submodules
@@ -229,24 +234,24 @@ workflows:
             - dependencies_npm
             - dependencies_apicast
 
-      - test1:
-          requires:
-            - assets_precompile
-      - test2:
-          requires:
-            - assets_precompile
-      - test3:
-          requires:
-            - assets_precompile
-      - test4:
-          requires:
-            - assets_precompile
-      - test5:
-          requires:
-            - assets_precompile
-      - test6:
-          requires:
-            - assets_precompile
+#      - test1:
+#          requires:
+#            - assets_precompile
+#      - test2:
+#          requires:
+#            - assets_precompile
+#      - test3:
+#          requires:
+#            - assets_precompile
+#      - test4:
+#          requires:
+#            - assets_precompile
+#      - test5:
+#          requires:
+#            - assets_precompile
+#      - test6:
+#          requires:
+#            - assets_precompile
       - licenses:
           requires:
             - assets_precompile
