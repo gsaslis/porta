@@ -172,10 +172,13 @@ jobs:
       - *restore-bundler-cache
       - *restore-npm-cache
       - run:
-          name: Rails tests
+          name: Prepare database & config files
           command: |
             cp config/examples/*.yml config/
             bundle exec rake db:create db:test:prepare
+      - run:
+          name: Rails tests
+          command: |
             bundle exec ruby -Itest -e 'ARGV.map(&File.method(:expand_path)).map(&method(:require))'  -- $(circleci tests glob "test/**/*_test.rb" | circleci tests split --split-by=timings)
       - *store-junit-test-results
       - *store-test-artifacts
@@ -196,10 +199,13 @@ jobs:
       - *restore-bundler-cache
       - *restore-npm-cache
       - run:
-          name: Rails tests
+          name: Prepare database & config files
           command: |
             cp config/examples/*.yml config/
             bundle exec rake db:create db:test:prepare
+      - run:
+          name: Rspec tests
+          command: |
             bundle exec rspec $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
       - *store-junit-test-results
       - *store-test-artifacts
@@ -221,9 +227,12 @@ jobs:
       - *restore-bundler-cache
       - *restore-npm-cache
       - run:
-          name: Rails tests
+          name: Prepare database
           command: |
             bundle exec rake db:create db:test:prepare
+      - run:
+          name: Run cucumber tests
+          command: |
             bundle exec cucumber --verbose $(circleci tests glob "features/**/*.feature" | circleci tests split --split-by=timings)
       - *store-junit-test-results
       - *store-test-artifacts
@@ -241,9 +250,6 @@ workflows:
             - dependencies_npm
 #            - dependencies_apicast
 
-#      - test1:
-#          requires:
-#            - assets_precompile
       - lint:
           requires:
             - assets_precompile
