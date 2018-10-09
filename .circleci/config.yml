@@ -118,7 +118,91 @@ jobs:
       - *store-junit-test-results
       - *store-test-artifacts
 
-  licenses:
+  lint:
+    docker:
+      - image: quay.io/gsaslis/3scale-system-builder
+      - image: mysql:5.7
+        environment:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_ROOT_PASSWORD: ''
+          MYSQL_DATABASE: circleci
+      - image: memcached:1.5-alpine
+      - image: redis:4.0-alpine
+    steps:
+      - checkout
+      - *git-submodules
+      - *attach-to-workspace
+      - *restore-bundler-cache
+      - *restore-npm-cache
+      - run:
+          name: Licences check
+          command: bundle exec rake ci:license_finder:run
+      - run:
+          name: Swagger validation
+          command: |
+            bundle exec rake doc:swagger:validate:all
+            bundle exec rake doc:swagger:generate:all
+      - run:
+          name: JSPM
+          command: |
+            bundle exec rake ci:jspm --trace
+      - run:
+          name: Yarn test
+          command: |
+            yarn test -- --reporters dots,junit --browsers Firefox
+            yarn jest
+      - run: bundle exec rake db:purge db:setup
+      - *store-junit-test-results
+      - *store-test-artifacts
+
+  test:
+    docker:
+      - image: quay.io/gsaslis/3scale-system-builder
+      - image: mysql:5.7
+        environment:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_ROOT_PASSWORD: ''
+          MYSQL_DATABASE: circleci
+      - image: memcached:1.5-alpine
+      - image: redis:4.0-alpine
+    steps:
+      - checkout
+      - *git-submodules
+      - *attach-to-workspace
+      - *restore-bundler-cache
+      - *restore-npm-cache
+      - run:
+          name: Rails tests
+          command: |
+            bundle exec rake db:setup
+            bundle exec ruby -Itest $(circleci tests glob "test/**/*_test.rb" | circleci tests split --split-by=timings)
+      - *store-junit-test-results
+      - *store-test-artifacts
+  rspec:
+    docker:
+      - image: quay.io/gsaslis/3scale-system-builder
+      - image: mysql:5.7
+        environment:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_ROOT_PASSWORD: ''
+          MYSQL_DATABASE: circleci
+      - image: memcached:1.5-alpine
+      - image: redis:4.0-alpine
+    steps:
+      - checkout
+      - *git-submodules
+      - *attach-to-workspace
+      - *restore-bundler-cache
+      - *restore-npm-cache
+      - run:
+          name: Rails tests
+          command: |
+            bundle exec rake db:setup
+            bundle exec rspec --verbose $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
+      - *store-junit-test-results
+      - *store-test-artifacts
+
+  cucumber:
     docker:
       - image: quay.io/gsaslis/3scale-system-builder
       - image: mysql:5.7
@@ -135,8 +219,10 @@ jobs:
       - *restore-bundler-cache
       - *restore-npm-cache
       - run:
-          name: Run tests 7
-          command: PROXY_ENABLED=1 MULTIJOB_KIND=licenses make test-no-deps
+          name: Rails tests
+          command: |
+            bundle exec rake db:setup
+            bundle exec cucumber --verbose $(circleci tests glob "features/**/*.feature" | circleci tests split --split-by=timings)
       - *store-junit-test-results
       - *store-test-artifacts
 
@@ -156,6 +242,15 @@ workflows:
 #      - test1:
 #          requires:
 #            - assets_precompile
-      - licenses:
+      - lint:
+          requires:
+            - assets_precompile
+      - test:
+          requires:
+            - dependencies_bundler
+      - rspec:
+          requires:
+            - dependencies_bundler
+      - cucumber:
           requires:
             - assets_precompile
