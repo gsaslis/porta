@@ -49,7 +49,9 @@ jobs:
       - *restore-bundler-cache
       - run:
           name: Install gems with bundler
-          command: make bundle-in-container
+          command: |
+            gem install bundler --version 1.16.2 --no-doc
+            make bundle-in-container
       - save_cache:
           key: v1-bundler-gems-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
           paths:
