@@ -86,16 +86,12 @@ run: $(DOCKER_COMPOSE)
 test: ## Runs tests inside container build environment
 test: COMPOSE_FILE = $(COMPOSE_TEST_FILE)
 test: CMD = $(SCRIPT_TEST)
-test: $(DOCKER_COMPOSE) info
-	@echo
-	@echo "======= Tests ======="
-	@echo
-	$(MAKE) test-run tmp-export --keep-going
+test: test-with-info
 
 test-no-deps: ## Runs only tests (without dependency installation) inside container build environment
 test-no-deps: COMPOSE_FILE = $(COMPOSE_TEST_FILE)
 test-no-deps: CMD = script/jenkins.sh
-test-no-deps: $(DOCKER_COMPOSE) info
+test-no-deps: test-with-info
 	@echo
 	@echo "======= Tests ======="
 	@echo
@@ -106,6 +102,11 @@ test-run: COMPOSE_FILE = $(COMPOSE_TEST_FILE)
 test-run: $(DOCKER_COMPOSE) clean-tmp cache
 	$(DOCKER_COMPOSE) run --name $(PROJECT)-build $(DOCKER_ENV) build $(CMD)
 
+test-with-info: $(DOCKER_COMPOSE) info
+	@echo
+	@echo "======= Tests ======="
+	@echo
+	$(MAKE) test-run tmp-export --keep-going
 
 tmp-export: ## Copies files from inside docker container to local tmp folder.
 tmp-export: IMAGE ?= $(PROJECT)-build
