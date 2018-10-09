@@ -40,6 +40,13 @@ restore-assets-cache: &restore-assets-cache
 
 
 jobs:
+  test:
+    docker:
+      - image: circleci/ruby:2.3-node-browsers-legacy
+    steps:
+      - checkout
+      - *git-submodules
+
   dependencies_bundler:
     machine:
       docker_layer_caching: true
@@ -218,35 +225,6 @@ jobs:
 
 workflows:
   version: 2
-  parallel_build:
+  test:
     jobs:
-      - dependencies_bundler
-      - dependencies_npm
-      - dependencies_apicast
-      - assets_precompile:
-          requires:
-            - dependencies_bundler
-            - dependencies_npm
-            - dependencies_apicast
-
-      - test1:
-          requires:
-            - assets_precompile
-      - test2:
-          requires:
-            - assets_precompile
-      - test3:
-          requires:
-            - assets_precompile
-      - test4:
-          requires:
-            - assets_precompile
-      - test5:
-          requires:
-            - assets_precompile
-      - test6:
-          requires:
-            - assets_precompile
-      - licenses:
-          requires:
-            - assets_precompile
+      - test
