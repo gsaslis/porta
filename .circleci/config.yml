@@ -175,7 +175,7 @@ jobs:
           name: Rails tests
           command: |
             cp config/examples/*.yml config/
-            bundle exec rake db:setup
+            bundle exec rake db:create db:test:prepare
             bundle exec ruby -Itest -e 'ARGV.map(&File.method(:expand_path)).map(&method(:require))'  -- $(circleci tests glob "test/**/*_test.rb" | circleci tests split --split-by=timings)
       - *store-junit-test-results
       - *store-test-artifacts
@@ -199,7 +199,7 @@ jobs:
           name: Rails tests
           command: |
             cp config/examples/*.yml config/
-            bundle exec rake db:setup
+            bundle exec rake db:create db:test:prepare
             bundle exec rspec $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
       - *store-junit-test-results
       - *store-test-artifacts
@@ -223,7 +223,7 @@ jobs:
       - run:
           name: Rails tests
           command: |
-            bundle exec rake db:setup
+            bundle exec rake db:create db:test:prepare
             bundle exec cucumber --verbose $(circleci tests glob "features/**/*.feature" | circleci tests split --split-by=timings)
       - *store-junit-test-results
       - *store-test-artifacts
