@@ -43,7 +43,6 @@ jobs:
   dependencies_bundler:
     docker:
       - image: quay.io/gsaslis/3scale-system-builder
-        user: ruby
     steps:
       - checkout
       - *git-submodules
@@ -59,7 +58,6 @@ jobs:
   dependencies_npm:
     docker:
       - image: quay.io/gsaslis/3scale-system-builder
-        user: ruby
     steps:
       - checkout
       - *git-submodules
@@ -76,7 +74,6 @@ jobs:
   dependencies_apicast:
     docker:
       - image: quay.io/gsaslis/3scale-system-builder
-        user: ruby
     steps:
       - checkout
       - *git-submodules
@@ -91,7 +88,6 @@ jobs:
   assets_precompile:
     docker:
       - image: quay.io/gsaslis/3scale-system-builder
-        user: ruby
     steps:
       - checkout
       - *git-submodules
@@ -207,7 +203,6 @@ jobs:
   licenses:
     docker:
       - image: quay.io/gsaslis/3scale-system-builder
-        user: ruby
       - image: mysql:5.7
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
