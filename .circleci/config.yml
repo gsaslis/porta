@@ -176,7 +176,7 @@ jobs:
           command: |
             cp config/examples/*.yml config/
             bundle exec rake db:setup
-            bundle exec ruby -Itest $(circleci tests glob "test/**/*_test.rb" | circleci tests split --split-by=timings)
+            bundle exec ruby -Itest -e 'ARGV.map(&File.method(:expand_path)).map(&method(:require))'  -- $(circleci tests glob "test/**/*_test.rb" | circleci tests split --split-by=timings)
       - *store-junit-test-results
       - *store-test-artifacts
   rspec:
