@@ -30,10 +30,6 @@ restore-npm-cache: &restore-npm-cache
 #  restore_cache:
 #    keys:
 #      - v1-gateway-{{ arch }}-{{ .Branch }}-{{ .Revision }}
-restore-assets-cache: &restore-assets-cache
-  restore_cache:
-    keys:
-      - v1-assets-{{ arch }}-{{ .Branch }}-{{ .Revision }}
 
 
 
@@ -57,11 +53,6 @@ jobs:
           paths:
             - ./vendor/bundle
             - ./.bundle/
-      - persist_to_workspace:
-          root: .
-          paths:
-          - ./vendor/bundle
-          - ./.bundle/
   dependencies_npm:
     docker:
       - image: quay.io/gsaslis/3scale-system-builder
@@ -74,12 +65,6 @@ jobs:
           command: make npm-install-in-container
       - save_cache:
           key: v1-npm-{{ arch }}-{{ .Branch }}-{{ checksum "package.json" }}
-          paths:
-            - ./node_modules
-            - ./assets/jspm_packages
-            - ./.jspm
-      - persist_to_workspace:
-          root: .
           paths:
             - ./node_modules
             - ./assets/jspm_packages
@@ -105,19 +90,18 @@ jobs:
     steps:
       - checkout
       - *git-submodules
-      - *attach-to-workspace
-      - *restore-assets-cache
+      - *restore-bundler-cache
+      - *restore-npm-cache
       - run:
           name: Precompile assets
-          command: make precompile-assets
-      - save_cache:
-          key: v1-assets-{{ arch }}-{{ .Branch }}-{{ .Revision }}
-          paths:
-            - ./public/assets
+          command: |
+            cp config/examples/*.yml config/
+            make precompile-assets
       - persist_to_workspace:
           root: .
           paths:
             - ./public/assets
+            - ./config/*.yml
 
   test1:
     machine:
@@ -128,90 +112,9 @@ jobs:
       - *restore-bundler-cache
       - *restore-npm-cache
 #      - *restore-gateway-cache
-      - *restore-assets-cache
       - run:
           name: Run tests 1
           command: MULTIJOB_KIND=1 make test-no-deps
-      - *store-junit-test-results
-      - *store-test-artifacts
-
-  test2:
-    machine:
-      docker_layer_caching: true
-    steps:
-      - checkout
-      - *git-submodules
-      - *restore-bundler-cache
-      - *restore-npm-cache
-#      - *restore-gateway-cache
-      - *restore-assets-cache
-      - run:
-          name: Run tests 2
-          command: MULTIJOB_KIND=2 make test-no-deps
-      - *store-junit-test-results
-      - *store-test-artifacts
-
-  test3:
-    machine:
-      docker_layer_caching: true
-    steps:
-      - checkout
-      - *git-submodules
-      - *restore-bundler-cache
-      - *restore-npm-cache
-#      - *restore-gateway-cache
-      - *restore-assets-cache
-      - run:
-          name: Run tests 3
-          command: MULTIJOB_KIND=3 make test-no-deps
-      - *store-junit-test-results
-      - *store-test-artifacts
-
-  test4:
-    machine:
-      docker_layer_caching: true
-    steps:
-      - checkout
-      - *git-submodules
-      - *restore-bundler-cache
-      - *restore-npm-cache
-#      - *restore-gateway-cache
-      - *restore-assets-cache
-      - run:
-          name: Run tests 4
-          command: MULTIJOB_KIND=4 make test-no-deps
-      - *store-junit-test-results
-      - *store-test-artifacts
-
-  test5:
-    machine:
-      docker_layer_caching: true
-    steps:
-      - checkout
-      - *git-submodules
-      - *restore-bundler-cache
-      - *restore-npm-cache
-#      - *restore-gateway-cache
-      - *restore-assets-cache
-      - run:
-          name: Run tests 5
-          command: MULTIJOB_KIND=5 make test-no-deps
-      - *store-junit-test-results
-      - *store-test-artifacts
-
-  test6:
-    machine:
-      docker_layer_caching: true
-    steps:
-      - checkout
-      - *git-submodules
-      - *restore-bundler-cache
-      - *restore-npm-cache
-#      - *restore-gateway-cache
-      - *restore-assets-cache
-      - run:
-          name: Run tests 6
-          command: MULTIJOB_KIND=6 make test-no-deps
       - *store-junit-test-results
       - *store-test-artifacts
 
@@ -227,6 +130,8 @@ jobs:
       - checkout
       - *git-submodules
       - *attach-to-workspace
+      - *restore-bundler-cache
+      - *restore-npm-cache
       - run:
           name: Run tests 7
           command: PROXY_ENABLED=1 MULTIJOB_KIND=licenses make test-no-deps
@@ -247,21 +152,6 @@ workflows:
 #            - dependencies_apicast
 
 #      - test1:
-#          requires:
-#            - assets_precompile
-#      - test2:
-#          requires:
-#            - assets_precompile
-#      - test3:
-#          requires:
-#            - assets_precompile
-#      - test4:
-#          requires:
-#            - assets_precompile
-#      - test5:
-#          requires:
-#            - assets_precompile
-#      - test6:
 #          requires:
 #            - assets_precompile
       - licenses:
