@@ -307,10 +307,10 @@ workflows:
             - assets_precompile
       - unit:
           requires:
-            - dependencies_bundler
+            - assets_precompile
       - functional:
           requires:
-            - dependencies_bundler
+            - assets_precompile
       - integration:
           requires:
             - assets_precompile
