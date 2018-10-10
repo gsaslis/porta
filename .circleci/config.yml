@@ -103,20 +103,22 @@ jobs:
             - ./public/assets
             - ./config/*.yml
 
-  test1:
-    machine:
-      docker_layer_caching: true
+  test:
+    docker:
+      - image: quay.io/gsaslis/3scale-system-builder
+      - image: quay.io/mikz/dnsmasq
+        command:
+          - --no-poll
+          - --address=/#/127.0.0.1
+      - image: circleci/mysql:5.7-ram
+        environment:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_ROOT_PASSWORD: ''
+          MYSQL_DATABASE: circleci
+      - image: memcached:1.5-alpine
+      - image: redis:4.0-alpine
     steps:
       - checkout
-      - *git-submodules
-      - *restore-bundler-cache
-      - *restore-npm-cache
-#      - *restore-gateway-cache
-      - run:
-          name: Run tests 1
-          command: MULTIJOB_KIND=1 make test-no-deps
-      - *store-junit-test-results
-      - *store-test-artifacts
 
   lint:
     docker:
@@ -303,30 +305,4 @@ workflows:
   version: 2
   parallel_build:
     jobs:
-      - dependencies_bundler
-      - dependencies_npm
-#      - dependencies_apicast
-      - assets_precompile:
-          requires:
-            - dependencies_bundler
-            - dependencies_npm
-#            - dependencies_apicast
-
-      - lint:
-          requires:
-            - assets_precompile
-      - unit:
-          requires:
-            - dependencies_bundler
-      - functional:
-          requires:
-            - dependencies_bundler
-      - integration:
-          requires:
-            - assets_precompile
-      - rspec:
-          requires:
-            - dependencies_bundler
-      - cucumber:
-          requires:
-            - assets_precompile
+      - test
