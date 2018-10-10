@@ -182,6 +182,7 @@ jobs:
       - *store-junit-test-results
       - *store-test-artifacts
   functional:
+    parallelism: 4
     docker:
       - image: quay.io/gsaslis/3scale-system-builder
       - image: circleci/mysql:5.7-ram
@@ -191,7 +192,6 @@ jobs:
           MYSQL_DATABASE: circleci
       - image: memcached:1.5-alpine
       - image: redis:4.0-alpine
-    parallelism: 4
     steps:
       - checkout
       - *git-submodules
@@ -211,6 +211,7 @@ jobs:
       - *store-junit-test-results
       - *store-test-artifacts
   integration:
+    parallelism: 4
     docker:
       - image: quay.io/gsaslis/3scale-system-builder
       - image: circleci/mysql:5.7-ram
@@ -237,6 +238,7 @@ jobs:
       - *store-junit-test-results
       - *store-test-artifacts
   rspec:
+    parallelism: 4
     docker:
       - image: quay.io/gsaslis/3scale-system-builder
       - image: circleci/mysql:5.7-ram
