@@ -46,6 +46,7 @@ namespace :test do
     end
 
     t.verbose = verbose
+    t.loader = :direct
   end
 
   namespace :files do
