@@ -320,7 +320,7 @@ workflows:
             - dependencies_bundler
       - integration:
           requires:
-            - dependencies_bundler
+            - assets_precompile
       - rspec:
           requires:
             - dependencies_bundler
