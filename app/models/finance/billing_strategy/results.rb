@@ -30,7 +30,7 @@ class Finance::BillingStrategy::Results
   end
 
   def failure(billing_strategy)
-    status = @providers[billing_strategy.provider.id] ||= {}
+    status = @providers[billing_strategy.&provider.&id] ||= {}
     status[:success] = false
     status[:errors] = billing_strategy.failed_buyers
   rescue
