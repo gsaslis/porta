@@ -53,6 +53,11 @@ jobs:
           paths:
             - ./vendor/bundle
             - ./.bundle/
+      - persist_to_workspace:
+          root: .
+          paths:
+          - ./vendor/bundle
+          - ./.bundle/
   dependencies_npm:
     docker:
       - image: quay.io/gsaslis/3scale-system-builder
@@ -65,6 +70,12 @@ jobs:
           command: make npm-install
       - save_cache:
           key: v1-npm-{{ arch }}-{{ .Branch }}-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
+            - ./assets/jspm_packages
+            - ./.jspm
+      - persist_to_workspace:
+          root: .
           paths:
             - ./node_modules
             - ./assets/jspm_packages
@@ -90,8 +101,7 @@ jobs:
     steps:
       - checkout
       - *git-submodules
-      - *restore-bundler-cache
-      - *restore-npm-cache
+      - *attach-to-workspace
       - run:
           name: Precompile assets
           command: |
@@ -102,21 +112,6 @@ jobs:
           paths:
             - ./public/assets
             - ./config/*.yml
-
-  test1:
-    machine:
-      docker_layer_caching: true
-    steps:
-      - checkout
-      - *git-submodules
-      - *restore-bundler-cache
-      - *restore-npm-cache
-#      - *restore-gateway-cache
-      - run:
-          name: Run tests 1
-          command: MULTIJOB_KIND=1 make test-no-deps
-      - *store-junit-test-results
-      - *store-test-artifacts
 
   lint:
     docker:
@@ -136,8 +131,6 @@ jobs:
       - checkout
       - *git-submodules
       - *attach-to-workspace
-      - *restore-bundler-cache
-      - *restore-npm-cache
       - run:
           name: Licences check
           command: bundle exec rake ci:license_finder:run
@@ -176,8 +169,6 @@ jobs:
       - checkout
       - *git-submodules
       - *attach-to-workspace
-      - *restore-bundler-cache
-      - *restore-npm-cache
       - run:
           name: Prepare database & config files
           command: |
@@ -204,8 +195,6 @@ jobs:
       - checkout
       - *git-submodules
       - *attach-to-workspace
-      - *restore-bundler-cache
-      - *restore-npm-cache
       - run:
           name: Prepare database & config files
           command: |
@@ -234,8 +223,6 @@ jobs:
       - checkout
       - *git-submodules
       - *attach-to-workspace
-      - *restore-bundler-cache
-      - *restore-npm-cache
       - run:
           name: Prepare database & config files
           command: |
@@ -262,8 +249,6 @@ jobs:
       - checkout
       - *git-submodules
       - *attach-to-workspace
-      - *restore-bundler-cache
-      - *restore-npm-cache
       - run:
           name: Prepare database & config files
           command: |
@@ -290,8 +275,6 @@ jobs:
       - checkout
       - *git-submodules
       - *attach-to-workspace
-      - *restore-bundler-cache
-      - *restore-npm-cache
       - run:
           name: Prepare database
           command: |
