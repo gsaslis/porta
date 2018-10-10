@@ -155,7 +155,10 @@ jobs:
           command: |
             yarn test -- --reporters dots,junit --browsers Firefox
             yarn jest
-      - run: bundle exec rake db:purge db:setup
+      - run:
+          name: Database setup
+          command: |
+            bundle exec rake db:create db:purge db:setup
       - *store-junit-test-results
       - *store-test-artifacts
 
