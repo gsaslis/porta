@@ -129,6 +129,10 @@ jobs:
       - image: memcached:1.5-alpine
       - image: redis:4.0-alpine
     steps:
+      - run:
+          name: Start Xvfb
+          command: Xvfb :99 -screen 0 1280x1024x24
+          background: true
       - checkout
       - *git-submodules
       - *attach-to-workspace
