@@ -287,12 +287,16 @@ jobs:
           command: |
             bundle exec rake db:create db:test:prepare
       - run:
+          name: Disable internet access
+          command: sudo sed -c -i".bak" 's/127\.0\.0\.11$/127.0.0.1/' /etc/resolv.conf
+      - run:
           name: Run cucumber tests
           command: |
             TESTS=$(circleci tests glob "features/**/*.feature" | circleci tests split --split-by=timings)
-            # use local dns that points everything to localhost
-            sudo sed -c -i".bak" 's/127\.0\.0\.11$/127.0.0.1/' /etc/resolv.conf
             bundle exec cucumber --backtrace --verbose --format junit --out tmp/junit/cucumber --format progress ${TESTS}
+      - run:
+          name: Enabled internet access
+          command: sudo sed -c -i".bak" 's/127\.0\.0\.1$/127.0.0.11/' /etc/resolv.conf
       - *store-junit-test-results
       - *store-test-artifacts
       - store_artifacts:
