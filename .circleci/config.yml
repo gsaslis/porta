@@ -18,6 +18,11 @@ store-test-artifacts: &store-test-artifacts
     path: tmp/junit
     destination: junit
 
+store-log-artifacts: &store-log-artifacts
+  store_artifacts:
+    path: log/test.log
+    destination: test.log
+
 restore-bundler-cache: &restore-bundler-cache
   restore_cache:
     keys:
@@ -156,6 +161,7 @@ jobs:
       - *store-test-artifacts
 
   unit:
+    parallelism: 4
     docker:
       - image: quay.io/gsaslis/3scale-system-builder
       - image: circleci/mysql:5.7-ram
@@ -181,6 +187,7 @@ jobs:
             bundle exec rake test:run TESTS="$TESTS" TESTOPTS=--verbose --verbose --trace
       - *store-junit-test-results
       - *store-test-artifacts
+      - *store-log-artifacts
   functional:
     parallelism: 4
     docker:
@@ -210,6 +217,7 @@ jobs:
             LC_ALL: en_US.UTF-8
       - *store-junit-test-results
       - *store-test-artifacts
+      - *store-log-artifacts
   integration:
     parallelism: 4
     docker:
@@ -237,6 +245,7 @@ jobs:
             bundle exec rake test:run TESTS="$TESTS" TESTOPTS=--verbose --verbose --trace
       - *store-junit-test-results
       - *store-test-artifacts
+      - *store-log-artifacts
   rspec:
     parallelism: 4
     docker:
@@ -263,8 +272,10 @@ jobs:
             bundle exec rspec --format progress $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
       - *store-junit-test-results
       - *store-test-artifacts
+      - *store-log-artifacts
 
   cucumber:
+    parallelism: 4
     docker:
       - image: quay.io/gsaslis/3scale-system-builder
       - image: quay.io/mikz/dnsmasq
@@ -299,6 +310,7 @@ jobs:
           command: sudo sed -c -i".bak" 's/127\.0\.0\.1$/127.0.0.11/' /etc/resolv.conf
       - *store-junit-test-results
       - *store-test-artifacts
+      - *store-log-artifacts
       - store_artifacts:
           path: tmp/capybara
           destination: capybara
