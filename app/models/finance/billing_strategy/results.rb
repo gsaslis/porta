@@ -11,26 +11,26 @@ class Finance::BillingStrategy::Results
   end
 
   def start(billing_strategy)
-    @providers[billing_strategy.provider.id] = { errors: [], success: false }
+    @providers[billing_strategy.account_id] = { errors: [], success: false }
   rescue
     Rails.logger.error('Failed to log a billing start')
     raise if Rails.env.test?
   end
 
   def success(billing_strategy)
-    @providers[billing_strategy.provider.id][:success] = true
-    @providers[billing_strategy.provider.id][:errors] = billing_strategy.failed_buyers
+    @providers[billing_strategy.account_id][:success] = true
+    @providers[billing_strategy.account_id][:errors] = billing_strategy.failed_buyers
   rescue
     Rails.logger.error('Failed to log a billing success')
     raise if Rails.env.test?
   end
 
   def skip(billing_strategy)
-    @providers[billing_strategy.provider.id] = { skip: true, errors: [] }
+    @providers[billing_strategy.account_id] = { skip: true, errors: [] }
   end
 
   def failure(billing_strategy)
-    status = @providers[billing_strategy.&provider.&id] ||= {}
+    status = @providers[billing_strategy.account_id] ||= {}
     status[:success] = false
     status[:errors] = billing_strategy.failed_buyers
   rescue
