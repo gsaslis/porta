@@ -42,10 +42,13 @@ attach-to-workspace: &attach-to-workspace
   attach_workspace:
     at: .
 
+system-builder: &system-builder
+  image: quay.io/gsaslis/3scale-system-builder
+
 jobs:
   dependencies_bundler:
     docker:
-      - image: quay.io/gsaslis/3scale-system-builder
+      - *system-builder
     steps:
       - checkout
       - *git-submodules
@@ -65,7 +68,7 @@ jobs:
           - ./.bundle/
   dependencies_npm:
     docker:
-      - image: quay.io/gsaslis/3scale-system-builder
+      - *system-builder
     steps:
       - checkout
       - *git-submodules
@@ -102,7 +105,7 @@ jobs:
 #            - ./vendor/docker-gateway/.luarocks
   assets_precompile:
     docker:
-      - image: quay.io/gsaslis/3scale-system-builder
+      - *system-builder
     steps:
       - checkout
       - *git-submodules
@@ -120,7 +123,7 @@ jobs:
 
   lint:
     docker:
-      - image: quay.io/gsaslis/3scale-system-builder
+      - *system-builder
       - image: circleci/mysql:5.7-ram
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
@@ -163,7 +166,7 @@ jobs:
   unit:
     parallelism: 4
     docker:
-      - image: quay.io/gsaslis/3scale-system-builder
+      - *system-builder
       - image: circleci/mysql:5.7-ram
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
@@ -191,7 +194,7 @@ jobs:
   functional:
     parallelism: 4
     docker:
-      - image: quay.io/gsaslis/3scale-system-builder
+      - *system-builder
       - image: circleci/mysql:5.7-ram
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
@@ -221,7 +224,7 @@ jobs:
   integration:
     parallelism: 4
     docker:
-      - image: quay.io/gsaslis/3scale-system-builder
+      - *system-builder
       - image: circleci/mysql:5.7-ram
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
@@ -249,7 +252,7 @@ jobs:
   rspec:
     parallelism: 4
     docker:
-      - image: quay.io/gsaslis/3scale-system-builder
+      - *system-builder
       - image: circleci/mysql:5.7-ram
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
@@ -277,7 +280,7 @@ jobs:
   cucumber:
     parallelism: 4
     docker:
-      - image: quay.io/gsaslis/3scale-system-builder
+      - *system-builder
       - image: quay.io/mikz/dnsmasq
         command:
         - --no-poll
