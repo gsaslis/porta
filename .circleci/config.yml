@@ -272,6 +272,9 @@ jobs:
   cucumber:
     docker:
       - image: quay.io/gsaslis/3scale-system-builder
+      - image: quay.io/gsaslis/3scale-system-builder
+        user: root
+        command: dnsmasq --listen-address=127.0.0.1 --no-poll --address=/#/127.0.0.1 --user=root
       - image: circleci/mysql:5.7-ram
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
