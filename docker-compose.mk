@@ -1,9 +1,27 @@
-MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
-PROJECT_PATH := $(patsubst %/,%,$(dir $(MKFILE_PATH)))
 
 DOCKER_COMPOSE_VERSION := 1.21.0
 DOCKER_COMPOSE := $(BIN_PATH)/docker-compose
 DOCKER_COMPOSE_BIN := $(DOCKER_COMPOSE)-$(DOCKER_COMPOSE_VERSION)
+
+COMPOSE_PROJECT_NAME := $(PROJECT)
+COMPOSE_FILE := docker-compose.yml
+COMPOSE_TEST_FILE := docker-compose.test-$(DB).yml
+
+ifeq ($(CI),true)
+DOCKER_ENV = CI=true
+else
+DOCKER_ENV = CI=jenkins
+endif
+
+DOCKER_ENV += $(foreach env,$(JENKINS_ENV),$(env)=$(value $(env)))
+DOCKER_ENV += GIT_TIMESTAMP=$(shell git log -1 --pretty=format:%ct)
+DOCKER_ENV += PERCY_PROJECT=3scale/porta PERCY_BRANCH=$(subst origin/,,$(GIT_BRANCH)) PERCY_COMMIT=$(GIT_COMMIT)
+DOCKER_ENV += $(RUBY_ENV)
+DOCKER_ENV += BUNDLE_GEMFILE=$(BUNDLE_GEMFILE)
+
+DOCKER_ENV := $(addprefix -e ,$(DOCKER_ENV))
+DOCKER_ENV += -e GIT_COMMIT_MESSAGE='$(subst ','\'',$(shell git log -1 --pretty=format:%B))'
+DOCKER_ENV += -e GIT_COMMITTED_DATE="$(shell git log -1 --pretty=format:%ai)"
 
 ifndef COMPOSE_PROJECT_NAME
 $(error missing COMPOSE_PROJECT_NAME)
@@ -15,6 +33,9 @@ endif
 
 export COMPOSE_PROJECT_NAME
 export COMPOSE_FILE
+
+
+all: clean clean-tmp build test ## Cleans environment, builds docker image and runs tests
 
 $(DOCKER_COMPOSE): $(DOCKER_COMPOSE_BIN)
 	@ln -sf $(realpath $(DOCKER_COMPOSE_BIN)) $(DOCKER_COMPOSE)
@@ -85,6 +106,11 @@ oracle-database:
 		-v $(PWD)/script/oracle:/opt/oracle/scripts/setup \
 		quay.io/3scale/oracle:12.2.0.1-ee
 
+oracle-db-setup: ## Creates databases in Oracle
+oracle-db-setup: oracle-database
+oracle-db-setup: CMD = MASTER_PASSWORD=p USER_PASSWORD=p ORACLE_SYSTEM_PASSWORD=threescalepass NLS_LANG='AMERICAN_AMERICA.UTF8' DISABLE_SPRING=true DB=oracle bundle exec rake db:drop db:create db:setup
+oracle-db-setup: run
+
 
 run: ## Starts containers and runs command $(CMD) inside the container in a non-interactive shell
 run: COMPOSE_FILE = $(COMPOSE_TEST_FILE)
@@ -94,19 +120,10 @@ run: $(DOCKER_COMPOSE)
 	@echo
 	$(DOCKER_COMPOSE) run --rm --name $(PROJECT)-build-run $(DOCKER_ENV) build bash -c "script/docker.sh && source script/proxy_env.sh && echo \"$(CMD)\" && $(CMD)"
 
-test: ## Runs tests inside container build environment
-test: COMPOSE_FILE = $(COMPOSE_TEST_FILE)
-test: CMD = $(SCRIPT_TEST)
-test: test-with-info
+schema: ## Runs db schema migrations. Run this when you have changes to your database schema that you have added as new migrations.
+schema: CMD = bundle exec rake db:migrate db:schema:dump && MASTER_PASSWORD=p USER_PASSWORD=p ORACLE_SYSTEM_PASSWORD=threescalepass NLS_LANG='AMERICAN_AMERICA.UTF8' DISABLE_SPRING=true DB=oracle bundle exec rake db:migrate db:schema:dump
+schema: run
 
-test-no-deps: ## Runs only tests (without dependency installation) inside container build environment
-test-no-deps: COMPOSE_FILE = $(COMPOSE_TEST_FILE)
-test-no-deps: CMD = script/jenkins.sh
-test-no-deps: test-with-info
-	@echo
-	@echo "======= Tests ======="
-	@echo
-	$(MAKE) test-run tmp-export --keep-going
 
 test-run: ## Runs test inside container
 test-run: COMPOSE_FILE = $(COMPOSE_TEST_FILE)
