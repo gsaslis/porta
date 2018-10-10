@@ -18,14 +18,43 @@ rescue LoadError
 end
 
 namespace :test do
-  Rake::TestTask.new(:specs) do |t|
-    t.libs << "test"
-    t.pattern = 'test/**/*_spec.rb'
+  test_groups = %i[integration functional].map do |kind|
+    [kind, FileList["test/#{kind}/**/*_test.rb"]]
+  end.to_h
+
+  test_groups[:unit] = FileList['test/**/*_test.rb'].exclude(*test_groups.values).exclude('test/{performance,remote}/**/*')
+
+  test_task = Class.new(Rails::TestTask) do
+    def file_list
+      if (tests = ENV['TESTS'])
+        FileList[tests.split]
+      else
+        super
+      end
+    end
   end
 
-  Rake::TestTask.new(:proxy) do |t|
-    t.libs << 'test'
-    t.pattern = 'test/proxy/**/*_test.rb'
+  Rake::Task[:run].clear
+
+  test_task.new(:run) do |t|
+    task t.name do
+      puts
+      t.file_list.each do |file|
+        print '* ', file, "\n"
+      end
+      puts
+    end
+
+    t.verbose = verbose
+  end
+
+  namespace :files do
+    test_groups.each do |name,file_list|
+      desc "Print test files for #{name} test group"
+      task name do
+        puts file_list
+      end
+    end
   end
 end
 
