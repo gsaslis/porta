@@ -296,7 +296,8 @@ jobs:
       - run:
           name: Run cucumber tests
           command: |
-            bundle exec cucumber --verbose $(circleci tests glob "features/**/*.feature" | circleci tests split --split-by=timings)
+            TESTS=$(circleci tests glob "features/**/*.feature" | circleci tests split --split-by=timings)
+            bundle exec cucumber --backtrace --verbose --format junit --out tmp/junit/cucumber --format progress ${TESTS}
       - *store-junit-test-results
       - *store-test-artifacts
 
