@@ -191,6 +191,7 @@ jobs:
           MYSQL_DATABASE: circleci
       - image: memcached:1.5-alpine
       - image: redis:4.0-alpine
+    parallelism: 4
     steps:
       - checkout
       - *git-submodules
