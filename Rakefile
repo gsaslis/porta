@@ -28,7 +28,7 @@ namespace :test do
   test_task = Class.new(Rails::TestTask) do
     def file_list
       if (tests = ENV['TESTS'])
-        FileList[tests.split]
+        FileList[tests.strip.split]
       else
         super
       end
@@ -38,12 +38,14 @@ namespace :test do
   Rake::Task[:run].clear
 
   test_task.new(:run) do |t|
+    desc "Run test files, can use TESTS to pass a list of files"
     task t.name do
       puts
+      puts "TESTS='"
       t.file_list.each do |file|
-        print '* ', file, "\n"
+        print "\t", file, "\n"
       end
-      puts
+      puts "'"
     end
 
     t.verbose = verbose
