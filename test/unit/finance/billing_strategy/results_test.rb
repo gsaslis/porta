@@ -4,8 +4,10 @@ class Finance::BillingStrategy::ResultsTest < ActiveSupport::TestCase
 
   test 'success' do
     results = Finance::BillingStrategy::Results.new(Date.new(2012,12,12))
-    b1 = OpenStruct.new(provider: OpenStruct.new(id: 1), failed_buyers: [] )
-    b2 = OpenStruct.new(provider: OpenStruct.new(id: 2), failed_buyers: [] )
+    b1 = Finance::BillingStrategy.new({ account_id: 1 }, without_protection: true)
+      .tap { |bs| bs.stubs(failed_buyers: []) }
+    b2 = Finance::BillingStrategy.new({ account_id: 2 }, without_protection: true)
+      .tap { |bs| bs.stubs(failed_buyers: []) }
 
     results.start(b1)
     results.success(b1)
@@ -22,12 +24,14 @@ class Finance::BillingStrategy::ResultsTest < ActiveSupport::TestCase
     results = Finance::BillingStrategy::Results.new(Date.new(2012,12,12))
 
     # ok
-    bs = OpenStruct.new(provider: OpenStruct.new(id: 1), failed_buyers: [])
+    bs = Finance::BillingStrategy.new({ account_id: 1 }, without_protection: true)
+      .tap { |bs| bs.stubs(failed_buyers: []) }
     results.start(bs)
     results.success(bs)
 
     # with errors
-    bs = OpenStruct.new(provider: OpenStruct.new(id: 2), failed_buyers: [ 4,5,6 ])
+    bs = Finance::BillingStrategy.new({ account_id: 2 }, without_protection: true)
+      .tap { |bs| bs.stubs(failed_buyers: [4,5,6]) }
     results.start(bs)
     results.success(bs)
 
@@ -39,9 +43,12 @@ class Finance::BillingStrategy::ResultsTest < ActiveSupport::TestCase
 
   test 'failed providers' do
     results = Finance::BillingStrategy::Results.new(Date.new(2012,12,12))
-    bs1 = OpenStruct.new(provider: OpenStruct.new(id: 101), failed_buyers: [ 1,2,3 ])
-    bs2 = OpenStruct.new(provider: OpenStruct.new(id: 202), failed_buyers: [ 4,5 ])
-    bs3 = OpenStruct.new(provider: OpenStruct.new(id: 303), failed_buyers: [])
+    bs1 = Finance::BillingStrategy.new({ account_id: 101 }, without_protection: true)
+      .tap { |bs| bs.stubs(failed_buyers: [1,2,3]) }
+    bs2 = Finance::BillingStrategy.new({ account_id: 202 }, without_protection: true)
+      .tap { |bs| bs.stubs(failed_buyers: [4,5]) }
+    bs3 = Finance::BillingStrategy.new({ account_id: 303 }, without_protection: true)
+      .tap { |bs| bs.stubs(failed_buyers: []) }
 
     results.start(bs1)
     results.success(bs1)
