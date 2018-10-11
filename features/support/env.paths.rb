@@ -1,3 +1,5 @@
+require_relative 'env'
+
 module NavigationHelpers
 
   include DeveloperPortal::Engine.routes.url_helpers

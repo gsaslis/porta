@@ -1,3 +1,5 @@
+require_relative 'env'
+
 Dir[File.dirname(__FILE__) + '/../../test/test_helpers/**/*.rb'].each do |file|
   require file
 end
