@@ -1,5 +1,11 @@
 require 'color'
 
+After do |scenario|
+  Capybara.reset_sessions!.values
+    .each { |session| session.visit('/check.txt') } # to flush all cancelled requests
+    .each { |session| session.server.try!(:reset_error!) }
+end
+
 Before '@fakeweb' do
   require 'fakeweb'
   FakeWeb.allow_net_connect = false
@@ -85,11 +91,6 @@ end
 # Also, note, that capybara adds this hook also. So our one request is actually reset again.
 # And that is good. And it won't leak, because it has no content.
 
-After do
-  Capybara.reset_sessions!.values
-    .each { |session| session.visit('/check.txt') } # to flush all cancelled requests
-    .each { |session| session.server.try!(:reset_error!) }
-end
 
 AfterStep do
   page.raise_server_error!
