@@ -140,7 +140,7 @@ class Finance::BillingStrategy < ApplicationRecord
   end
 
   def active?
-    provider.approved?
+    provider&.approved?
   end
 
   def build_invoice(opts = {})
