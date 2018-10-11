@@ -18,9 +18,10 @@ rescue LoadError
 end
 
 namespace :test do
-  test_groups = %i[integration functional].map do |kind|
-    [kind, FileList["test/#{kind}/**/*_test.rb"]]
-  end.to_h
+  test_groups = {
+    integration: FileList["test/{integration,controller}/**/*_test.rb"],
+    functional: FileList["test/{functional}/**/*_test.rb"],
+  }
 
   test_groups[:unit] = FileList['test/**/*_test.rb'].exclude(*test_groups.values).exclude('test/{performance,remote}/**/*')
 
