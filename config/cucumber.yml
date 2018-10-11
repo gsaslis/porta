@@ -4,5 +4,5 @@ parallel: --backtrace --format junit --out tmp/junit/cucumber-<%= [ENV['MULTIJOB
 <% tags = %w[ @backend @emails @stats @search @no-txn @javascript ] %>
 ci: --backtrace --strict --verbose --format junit --out tmp/junit/cucumber --format progress
 txn: --tags=~@wip <%= tags.map { |tag| "--tags=~#{tag}" }.join(' ') %>
-no-txn: --tags=~@wip --tag=<%= tags.join(',') %>
+no-txn: --tags=~@wip,~@ignore --tag=<%= tags.join(',') %>
 list: --dry-run --format Cucumber::Formatter::List
