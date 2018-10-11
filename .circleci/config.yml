@@ -306,8 +306,50 @@ jobs:
       - run:
           name: Run cucumber tests
           command: |
-            TESTS=$(circleci tests glob "features/**/*.feature" | circleci tests split --split-by=timings)
-            bundle exec cucumber --backtrace --verbose --format junit --out tmp/junit/cucumber --format progress ${TESTS}
+            TESTS=$(bundle exec cucumber --profile txn --profile list | circleci tests split --split-by=timings)
+            bundle exec cucumber --profile ci --profile txn ${TESTS}
+      - run:
+          name: Enabled internet access
+          command: sudo sed -c -i".bak" 's/127\.0\.0\.1$/127.0.0.11/' /etc/resolv.conf
+          when: always
+      - *store-junit-test-results
+      - *store-test-artifacts
+      - *store-log-artifacts
+      - store_artifacts:
+          path: tmp/capybara
+          destination: capybara
+
+  cucumber-javascript:
+    parallelism: 4
+    docker:
+      - *system-builder
+      - image: quay.io/mikz/dnsmasq
+        command:
+        - --no-poll
+        - --address=/#/127.0.0.1
+      - image: circleci/mysql:5.7-ram
+        environment:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_ROOT_PASSWORD: ''
+          MYSQL_DATABASE: circleci
+      - image: memcached:1.5-alpine
+      - image: redis:4.0-alpine
+    steps:
+      - checkout
+      - *git-submodules
+      - *attach-to-workspace
+      - run:
+          name: Prepare database
+          command: |
+            bundle exec rake db:create db:test:prepare
+      - run:
+          name: Disable internet access
+          command: sudo sed -c -i".bak" 's/127\.0\.0\.11$/127.0.0.1/' /etc/resolv.conf
+      - run:
+          name: Run cucumber tests
+          command: |
+            TESTS=$(bundle exec cucumber --profile no-txn --profile list | circleci tests split --split-by=timings)
+            bundle exec cucumber --profile ci --profile no-txn ${TESTS}
       - run:
           name: Enabled internet access
           command: sudo sed -c -i".bak" 's/127\.0\.0\.1$/127.0.0.11/' /etc/resolv.conf
@@ -348,5 +390,8 @@ workflows:
           requires:
             - dependencies_bundler
       - cucumber:
+          requires:
+            - assets_precompile
+      - cucumber-javascript:
           requires:
             - assets_precompile
