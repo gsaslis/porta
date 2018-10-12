@@ -162,6 +162,12 @@ jobs:
             bundle exec rake db:create db:purge db:setup
       - *store-junit-test-results
       - *store-test-artifacts
+      - store_artifacts:
+          path: doc/licenses
+          destination: licenses
+      - store_artifacts:
+          path: doc/active_docs
+          destination: active_docs
 
   unit:
     parallelism: 4
