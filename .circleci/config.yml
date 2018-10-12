@@ -277,7 +277,7 @@ jobs:
       - *store-test-artifacts
       - *store-log-artifacts
 
-  cucumber:
+  cucumber-no-txn:
     parallelism: 4
     docker:
       - *system-builder
@@ -306,7 +306,49 @@ jobs:
       - run:
           name: Run cucumber tests
           command: |
-            TESTS=$(bundle exec cucumber --profile txn --profile list | circleci tests split --split-by=timings)
+            TESTS=$(bundle exec cucumber --profile list --profile $(echo $CIRCLE_JOB | sed 's/cucumber-//') | circleci tests split --split-by=timings)
+            bundle exec cucumber --profile ci --profile txn ${TESTS}
+      - run:
+          name: Enabled internet access
+          command: sudo sed -c -i".bak" 's/127\.0\.0\.1$/127.0.0.11/' /etc/resolv.conf
+          when: always
+      - *store-junit-test-results
+      - *store-test-artifacts
+      - *store-log-artifacts
+      - store_artifacts:
+          path: tmp/capybara
+          destination: capybara
+
+  cucumber-txn:
+    parallelism: 4
+    docker:
+      - *system-builder
+      - image: quay.io/mikz/dnsmasq
+        command:
+        - --no-poll
+        - --address=/#/127.0.0.1
+      - image: circleci/mysql:5.7-ram
+        environment:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_ROOT_PASSWORD: ''
+          MYSQL_DATABASE: circleci
+      - image: memcached:1.5-alpine
+      - image: redis:4.0-alpine
+    steps:
+      - checkout
+      - *git-submodules
+      - *attach-to-workspace
+      - run:
+          name: Prepare database
+          command: |
+            bundle exec rake db:create db:test:prepare
+      - run:
+          name: Disable internet access
+          command: sudo sed -c -i".bak" 's/127\.0\.0\.11$/127.0.0.1/' /etc/resolv.conf
+      - run:
+          name: Run cucumber tests
+          command: |
+            TESTS=$(bundle exec cucumber --profile list --profile $(echo $CIRCLE_JOB | sed 's/cucumber-//') | circleci tests split --split-by=timings)
             bundle exec cucumber --profile ci --profile txn ${TESTS}
       - run:
           name: Enabled internet access
@@ -348,8 +390,8 @@ jobs:
       - run:
           name: Run cucumber tests
           command: |
-            TESTS=$(bundle exec cucumber --profile no-txn --profile list | circleci tests split --split-by=timings)
-            bundle exec cucumber --profile ci --profile no-txn ${TESTS}
+            TESTS=$(bundle exec cucumber --profile list --profile $(echo $CIRCLE_JOB | sed 's/cucumber-//') | circleci tests split --split-by=timings)
+            bundle exec cucumber --profile ci --profile txn ${TESTS}
       - run:
           name: Enabled internet access
           command: sudo sed -c -i".bak" 's/127\.0\.0\.1$/127.0.0.11/' /etc/resolv.conf
@@ -389,7 +431,10 @@ workflows:
       - rspec:
           requires:
             - dependencies_bundler
-      - cucumber:
+      - cucumber-txn:
+          requires:
+            - assets_precompile
+      - cucumber-no-txn:
           requires:
             - assets_precompile
       - cucumber-javascript:
