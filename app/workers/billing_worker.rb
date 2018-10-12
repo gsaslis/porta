@@ -29,7 +29,7 @@ class BillingWorker
   # @param [Time] billing_date
   # @param [ActiveRecord::Relation] buyers_scope
   def self.enqueue(provider, billing_date, buyers_scope = nil)
-    with_billing_batch(provider.id, billing_date) do
+    with_billing_batch(provider&.id, billing_date) do
       provider.buyer_accounts.select(:id, :provider_account_id).merge(buyers_scope).find_in_batches do |group|
         group.each { |buyer| enqueue_for_buyer(buyer, billing_date) }
       end
@@ -42,6 +42,7 @@ class BillingWorker
   end
 
   def self.with_billing_batch(provider_id, billing_date, &block)
+    return unless provider_id
     batch = Sidekiq::Batch.new
     batch.description = "Billing (id: #{provider_id})"
     batch.on(:complete, BillingWorker::Callback, batch_id: batch.bid, account_id: provider_id, billing_date: billing_date)
