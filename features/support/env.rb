@@ -1,3 +1,6 @@
+require 'knapsack_pro'
+KnapsackPro::Adapters::CucumberAdapter.bind
+
 require 'simplecov'
 SimpleCov.start
 

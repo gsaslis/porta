@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+require 'knapsack_pro'
+knapsack_pro_adapter = KnapsackPro::Adapters::MinitestAdapter.bind
+knapsack_pro_adapter.set_test_helper_path(__FILE__)
+
 ENV["RAILS_ENV"] ||= "test"
 
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
