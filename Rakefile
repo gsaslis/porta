@@ -67,4 +67,4 @@ Rake::Task['db:test:load'].enhance do
   Rake::Task['db:test:procedures'].invoke
 end
 
-KnapsackPro.load_tasks
+KnapsackPro.load_tasks if defined?(KnapsackPro)
