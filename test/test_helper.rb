@@ -7,8 +7,10 @@ require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'simplecov'
 SimpleCov.start
 
-require 'codecov'
-SimpleCov.formatter = SimpleCov::Formatter::Codecov
+if ENV['CI']
+  require 'codecov'
+  SimpleCov.formatter = SimpleCov::Formatter::Codecov
+end
 
 require 'minitest/unit'
 
