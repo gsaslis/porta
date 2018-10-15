@@ -30,7 +30,7 @@ class ProxyExampleTest < ActiveSupport::TestCase
   end
 
   def setup
-    skip 'Skipping APIcast tests'
+    skip 'Skipping APIcast tests' if ENV['CIRCLECI']
 
     WebMock.disable_net_connect!(allow: /foo.example.com/, allow_localhost: true)
     ## to reset the last_response in the fake backend
