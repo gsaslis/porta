@@ -170,7 +170,7 @@ jobs:
           destination: active_docs
 
   unit:
-    parallelism: 8
+    parallelism: 25
     docker:
       - *system-builder
       - image: circleci/mysql:5.7-ram
@@ -198,7 +198,7 @@ jobs:
       - *store-test-artifacts
       - *store-log-artifacts
   functional:
-    parallelism: 4
+    parallelism: 25
     docker:
       - *system-builder
       - image: circleci/mysql:5.7-ram
@@ -228,7 +228,7 @@ jobs:
       - *store-test-artifacts
       - *store-log-artifacts
   integration:
-    parallelism: 8
+    parallelism: 25
     docker:
       - *system-builder
       - image: circleci/mysql:5.7-ram
@@ -256,7 +256,7 @@ jobs:
       - *store-test-artifacts
       - *store-log-artifacts
   rspec:
-    parallelism: 4
+    parallelism: 25
     docker:
       - *system-builder
       - image: circleci/mysql:5.7-ram
@@ -284,7 +284,7 @@ jobs:
       - *store-log-artifacts
 
   cucumber-no-txn:
-    parallelism: 4
+    parallelism: 25
     docker:
       - *system-builder
       - image: quay.io/mikz/dnsmasq
@@ -326,7 +326,7 @@ jobs:
           destination: capybara
 
   cucumber-txn:
-    parallelism: 16
+    parallelism: 25
     docker:
       - *system-builder
       - image: quay.io/mikz/dnsmasq
@@ -368,7 +368,7 @@ jobs:
           destination: capybara
 
   cucumber-javascript:
-    parallelism: 4
+    parallelism: 25
     docker:
       - *system-builder
       - image: quay.io/mikz/dnsmasq
