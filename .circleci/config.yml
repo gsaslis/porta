@@ -9,6 +9,11 @@ git-submodules: &git-submodules
       git submodule init
       git submodule update
 
+upload-coverage: &upload-coverage
+  run:
+    name: Upload test coverage to Codecov
+    command: bash <(curl -s https://codecov.io/bash)
+
 store-junit-results: &store-junit-test-results
   store_test_results:
     path: tmp/junit
@@ -17,6 +22,11 @@ store-test-artifacts: &store-test-artifacts
   store_artifacts:
     path: tmp/junit
     destination: junit
+
+store-capybara-artifacts: &store-capybara-artifacts
+  store_artifacts:
+    path: tmp/capybara
+    destination: capybara
 
 store-log-artifacts: &store-log-artifacts
   store_artifacts:
@@ -168,6 +178,7 @@ jobs:
       - store_artifacts:
           path: doc/active_docs
           destination: active_docs
+      - *upload-coverage
 
   unit:
     parallelism: 25
@@ -198,6 +209,7 @@ jobs:
       - *store-junit-test-results
       - *store-test-artifacts
       - *store-log-artifacts
+      - *upload-coverage
   functional:
     parallelism: 25
     resource_class: small
@@ -229,6 +241,7 @@ jobs:
       - *store-junit-test-results
       - *store-test-artifacts
       - *store-log-artifacts
+      - *upload-coverage
   integration:
     parallelism: 25
     resource_class: small
@@ -258,6 +271,7 @@ jobs:
       - *store-junit-test-results
       - *store-test-artifacts
       - *store-log-artifacts
+      - *upload-coverage
   rspec:
     parallelism: 25
     resource_class: small
@@ -286,6 +300,7 @@ jobs:
       - *store-junit-test-results
       - *store-test-artifacts
       - *store-log-artifacts
+      - *upload-coverage
 
   cucumber-no-txn:
     parallelism: 25
@@ -296,6 +311,7 @@ jobs:
         command:
         - --no-poll
         - --address=/#/127.0.0.1
+        - --server=/codecov.io/8.8.8.8
       - image: circleci/mysql:5.7-ram
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
@@ -323,12 +339,15 @@ jobs:
           name: Enabled internet access
           command: sudo sed -c -i".bak" 's/127\.0\.0\.1$/127.0.0.11/' /etc/resolv.conf
           when: always
+      - run:
+          name: Enabled internet access
+          command: sudo sed -c -i".bak" 's/127\.0\.0\.1$/127.0.0.11/' /etc/resolv.conf
+          when: always
       - *store-junit-test-results
       - *store-test-artifacts
       - *store-log-artifacts
-      - store_artifacts:
-          path: tmp/capybara
-          destination: capybara
+      - *store-capybara-artifacts
+      - *upload-coverage
 
   cucumber-txn:
     parallelism: 25
@@ -369,9 +388,8 @@ jobs:
       - *store-junit-test-results
       - *store-test-artifacts
       - *store-log-artifacts
-      - store_artifacts:
-          path: tmp/capybara
-          destination: capybara
+      - *store-capybara-artifacts
+      - *upload-coverage
 
   cucumber-javascript:
     parallelism: 25
@@ -412,9 +430,8 @@ jobs:
       - *store-junit-test-results
       - *store-test-artifacts
       - *store-log-artifacts
-      - store_artifacts:
-          path: tmp/capybara
-          destination: capybara
+      - *store-capybara-artifacts
+      - *upload-coverage
 
 workflows:
   version: 2
