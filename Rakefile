@@ -23,7 +23,7 @@ namespace :test do
     functional: FileList["test/{functional}/**/*_test.rb"],
   }
 
-  test_groups[:unit] = FileList['test/**/*_test.rb'].exclude(*test_groups.values).exclude('test/{performance,remote}/**/*')
+  test_groups[:unit] = FileList['test/**/*_test.rb'].exclude(*test_groups.values).exclude('test/{performance,remote,support}/**/*')
 
   test_task = Class.new(Rails::TestTask) do
     def file_list
@@ -66,3 +66,5 @@ Rake::Task['db:test:load'].enhance do
   Rake::Task['multitenant:test:triggers'].invoke
   Rake::Task['db:test:procedures'].invoke
 end
+
+KnapsackPro.load_tasks if defined?(KnapsackPro)
