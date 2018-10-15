@@ -170,7 +170,7 @@ jobs:
           destination: active_docs
 
   unit:
-    parallelism: 4
+    parallelism: 8
     docker:
       - *system-builder
       - image: circleci/mysql:5.7-ram
@@ -228,7 +228,7 @@ jobs:
       - *store-test-artifacts
       - *store-log-artifacts
   integration:
-    parallelism: 4
+    parallelism: 8
     docker:
       - *system-builder
       - image: circleci/mysql:5.7-ram
@@ -326,7 +326,7 @@ jobs:
           destination: capybara
 
   cucumber-txn:
-    parallelism: 8
+    parallelism: 16
     docker:
       - *system-builder
       - image: quay.io/mikz/dnsmasq
