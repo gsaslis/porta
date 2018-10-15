@@ -171,6 +171,7 @@ jobs:
 
   unit:
     parallelism: 25
+    resource_class: small
     docker:
       - *system-builder
       - image: circleci/mysql:5.7-ram
@@ -199,6 +200,7 @@ jobs:
       - *store-log-artifacts
   functional:
     parallelism: 25
+    resource_class: small
     docker:
       - *system-builder
       - image: circleci/mysql:5.7-ram
@@ -229,6 +231,7 @@ jobs:
       - *store-log-artifacts
   integration:
     parallelism: 25
+    resource_class: small
     docker:
       - *system-builder
       - image: circleci/mysql:5.7-ram
@@ -257,6 +260,7 @@ jobs:
       - *store-log-artifacts
   rspec:
     parallelism: 25
+    resource_class: small
     docker:
       - *system-builder
       - image: circleci/mysql:5.7-ram
@@ -285,6 +289,7 @@ jobs:
 
   cucumber-no-txn:
     parallelism: 25
+    resource_class: small
     docker:
       - *system-builder
       - image: quay.io/mikz/dnsmasq
@@ -327,6 +332,7 @@ jobs:
 
   cucumber-txn:
     parallelism: 25
+    resource_class: small
     docker:
       - *system-builder
       - image: quay.io/mikz/dnsmasq
@@ -369,6 +375,7 @@ jobs:
 
   cucumber-javascript:
     parallelism: 25
+    resource_class: small
     docker:
       - *system-builder
       - image: quay.io/mikz/dnsmasq
