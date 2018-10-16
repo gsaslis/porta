@@ -39,4 +39,6 @@ group :development, :test do
     # gem 'pry-byebug', require: false, install_if: ENV.fetch('DISABLE_PRY_BYEBUG', '0') == '0'
     gem 'pry-stack_explorer', require: false
   end
+
+  gem 'knapsack_pro'
 end

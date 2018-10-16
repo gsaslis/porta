@@ -316,6 +316,7 @@ jobs:
         command:
         - --no-poll
         - --address=/#/127.0.0.1
+        - --server=/api.knapsackpro.com/127.0.0.11
       - image: circleci/mysql:5.7-ram
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
@@ -337,8 +338,7 @@ jobs:
       - run:
           name: Run cucumber tests
           command: |
-            TESTS=$(bundle exec cucumber --profile list --profile default | circleci tests split --split-by=timings)
-            bundle exec cucumber --profile ci ${TESTS}
+            bundle excec rake knapsack_pro:cucumber[--profile=ci]
       - run:
           name: Enabled internet access
           command: sudo sed -c -i".bak" 's/127\.0\.0\.1$/127.0.0.11/' /etc/resolv.conf
@@ -381,3 +381,4 @@ workflows:
       - cucumber:
           requires:
             - assets_precompile
+          context: knapsack
